@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Темп">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Темп — спортивный трекер</title>
+<style>
+:root{
+  --bg:#0a0a0f;
+  --surface:#15151f;
+  --surface-2:#1e1e2c;
+  --line:#2a2a3a;
+  --text:#f2f2f7;
+  --muted:#8b8b9e;
+  --lime:#c8ff3d;
+  --lime-dim:#9bc62e;
+  --flame:#ff5a36;
+  --ice:#36c9ff;
+  --violet:#9d6cff;
+  --gold:#ffce47;
+  --ok:#3ddc84;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;}
+body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
+.wrap{max-width:520px;margin:0 auto;padding:0 18px;}
+
+/* ===== Header ===== */
+.top{padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:8px;display:flex;align-items:flex-end;justify-content:space-between;}
+.brand{font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.date{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;margin-top:6px;}
+.streak{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);padding:8px 13px;border-radius:100px;font-weight:700;font-size:15px;}
+.streak b{color:var(--flame);}
+
+/* ===== Week ring hero ===== */
+.hero{margin-top:22px;background:linear-gradient(160deg,#181826,#101019);border:1px solid var(--line);border-radius:28px;padding:24px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(200,255,61,.14),transparent 70%);}
+.hero-row{display:flex;align-items:center;gap:22px;position:relative;}
+.ring{flex:0 0 132px;width:132px;height:132px;position:relative;}
+.ring svg{transform:rotate(-90deg);}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-pct{font-size:32px;font-weight:850;letter-spacing:-.03em;line-height:1;}
+.ring-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-top:4px;font-weight:700;}
+.hero-info{flex:1;}
+.hero-label{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);font-weight:800;}
+.hero-count{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:4px;}
+.hero-count small{font-size:18px;color:var(--muted);font-weight:700;}
+.hero-msg{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.4;}
+
+/* week dots */
+.weekdays{display:flex;justify-content:space-between;margin-top:22px;position:relative;}
+.wd{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;}
+.wd-name{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.wd-dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted);transition:.3s;}
+.wd.done .wd-dot{background:var(--lime);border-color:var(--lime);color:#0a0a0f;}
+.wd.partial .wd-dot{border-color:var(--lime);color:var(--lime);}
+.wd.today .wd-name{color:var(--text);}
+.wd.today .wd-dot{box-shadow:0 0 0 3px rgba(200,255,61,.2);}
+
+/* ===== Section title ===== */
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:30px 4px 14px;}
+.sec h2{font-size:20px;font-weight:800;letter-spacing:-.01em;}
+.sec .link{font-size:14px;color:var(--lime);font-weight:700;background:none;border:none;cursor:pointer;}
+
+/* ===== Activity cards ===== */
+.acts{display:flex;flex-direction:column;gap:12px;}
+.act{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 16px 16px 18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:.2s;}
+.act-bar{position:absolute;left:0;top:0;bottom:0;width:5px;}
+.act-icon{flex:0 0 46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface-2);}
+.act-body{flex:1;min-width:0;}
+.act-name{font-size:17px;font-weight:750;letter-spacing:-.01em;}
+.act-prog{font-size:13px;color:var(--muted);margin-top:3px;font-weight:600;}
+.act-track{height:6px;background:var(--surface-2);border-radius:6px;margin-top:9px;overflow:hidden;}
+.act-fill{height:100%;border-radius:6px;transition:width .4s cubic-bezier(.2,.8,.2,1);}
+.act-btn{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);color:var(--text);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.act-btn:active{transform:scale(.88);}
+.act.complete .act-btn{background:var(--ok);border-color:var(--ok);color:#0a0a0f;}
+.act.complete .act-name{color:var(--muted);}
+.act-undo{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;display:none;}
+
+/* ===== Add button ===== */
+.add{margin-top:14px;width:100%;background:var(--surface);border:1px dashed var(--line);border-radius:20px;padding:17px;color:var(--muted);font-size:15px;font-weight:700;cursor:pointer;transition:.2s;}
+.add:active{transform:scale(.98);}
+
+/* ===== Bottom nav ===== */
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,15,.86);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:10px 0 calc(env(safe-area-inset-bottom) + 10px);display:flex;justify-content:center;gap:6px;z-index:50;}
+.nav-in{display:flex;width:100%;max-width:520px;}
+.nav-btn{flex:1;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px;}
+.nav-btn svg{width:24px;height:24px;}
+.nav-btn.active{color:var(--lime);}
+
+/* ===== Pages ===== */
+.page{display:none;padding-bottom:120px;}
+.page.active{display:block;}
+.page-top{padding-top:calc(env(safe-area-inset-top) + 22px);}
+.page-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:22px;}
+
+/* stats cards */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.statcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;}
+.statcard .v{font-size:32px;font-weight:850;letter-spacing:-.03em;}
+.statcard .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-top:4px;}
+.statcard.accent .v{color:var(--lime);}
+.statcard.flame .v{color:var(--flame);}
+.statcard.gold .v{color:var(--gold);}
+
+/* history bars */
+.histbar{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px;}
+.histbar h3{font-size:15px;font-weight:750;margin-bottom:16px;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:130px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end;}
+.bar{width:100%;background:var(--surface-2);border-radius:6px 6px 3px 3px;min-height:4px;transition:height .5s;position:relative;}
+.bar-lbl{font-size:11px;color:var(--muted);font-weight:700;}
+.bar-val{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;font-weight:800;color:var(--text);}
+
+/* records list */
+.rec{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px 16px;margin-top:11px;}
+.rec-medal{font-size:26px;}
+.rec-body{flex:1;}
+.rec-title{font-size:16px;font-weight:750;}
+.rec-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.rec-val{font-size:20px;font-weight:850;color:var(--gold);}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:6px;}
+.badge{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 8px;text-align:center;opacity:.32;filter:grayscale(1);transition:.3s;}
+.badge.earned{opacity:1;filter:none;border-color:var(--violet);}
+.badge .emo{font-size:30px;}
+.badge .bn{font-size:12px;font-weight:750;margin-top:7px;}
+.badge .bd{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
+
+/* calendar heatmap */
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px;}
+.heat-cell{aspect-ratio:1;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;}
+.heat-h{font-size:10px;color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;padding-bottom:2px;}
+.legend{display:flex;align-items:center;gap:7px;justify-content:flex-end;margin-top:14px;font-size:11px;color:var(--muted);}
+.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;}
+
+/* ===== Modal ===== */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+.modal.open{display:flex;}
+.sheet{background:var(--surface);width:100%;max-width:520px;border-radius:28px 28px 0 0;padding:26px 22px calc(env(safe-area-inset-bottom) + 26px);border:1px solid var(--line);border-bottom:none;animation:up .3s cubic-bezier(.2,.9,.2,1);}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet h3{font-size:22px;font-weight:800;margin-bottom:18px;}
+.field{margin-bottom:16px;}
+.field label{font-size:13px;color:var(--muted);font-weight:700;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+.field input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:17px;font-family:inherit;}
+.field input:focus{outline:none;border-color:var(--lime);}
+.emojis{display:flex;flex-wrap:wrap;gap:8px;}
+.emo-pick{width:46px;height:46px;border-radius:13px;background:var(--surface-2);border:2px solid transparent;font-size:23px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.emo-pick.sel{border-color:var(--lime);background:var(--surface);}
+.colors{display:flex;gap:10px;flex-wrap:wrap;}
+.col-pick{width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+.col-pick.sel{border-color:var(--text);}
+.stepper{display:flex;align-items:center;gap:16px;}
+.stepper button{width:46px;height:46px;border-radius:13px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);font-size:24px;font-weight:700;cursor:pointer;}
+.stepper .num{font-size:28px;font-weight:850;min-width:54px;text-align:center;}
+.stepper .num small{font-size:14px;color:var(--muted);font-weight:600;display:block;}
+.sheet-btns{display:flex;gap:11px;margin-top:24px;}
+.btn{flex:1;border:none;border-radius:15px;padding:16px;font-size:16px;font-weight:750;cursor:pointer;font-family:inherit;}
+.btn-primary{background:var(--lime);color:#0a0a0f;}
+.btn-ghost{background:var(--surface-2);color:var(--text);}
+.btn-danger{background:none;color:var(--flame);}
+
+/* toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120px);bottom:calc(env(safe-area-inset-bottom) + 90px);background:var(--lime);color:#0a0a0f;padding:13px 22px;border-radius:100px;font-weight:800;font-size:15px;z-index:200;transition:transform .35s cubic-bezier(.2,.9,.2,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:15px;line-height:1.5;}
+.confetti{position:fixed;width:10px;height:10px;z-index:150;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- ============ TODAY ============ -->
+<div class="page active" id="page-today">
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">Темп</div>
+      <div class="date" id="todayDate">—</div>
+    </div>
+    <div class="streak">🔥 <b id="streakNum">0</b> дней</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-row">
+      <div class="ring">
+        <svg width="132" height="132" viewBox="0 0 132 132">
+          <circle cx="66" cy="66" r="58" fill="none" stroke="#2a2a3a" stroke-width="11"/>
+          <circle id="ringFill" cx="66" cy="66" r="58" fill="none" stroke="url(#g)" stroke-width="11" stroke-linecap="round" stroke-dasharray="364.4" stroke-dashoffset="364.4"/>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#c8ff3d"/><stop offset="1" stop-color="#3ddc84"/>
+          </linearGradient></defs>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-sub">неделя</div>
+        </div>
+      </div>
+      <div class="hero-info">
+        <div class="hero-label">Прогресс недели</div>
+        <div class="hero-count"><span id="weekDone">0</span><small>/<span id="weekGoal">0</span> трен.</small></div>
+        <div class="hero-msg" id="heroMsg">Добавь тренировки и начни неделю.</div>
+      </div>
+    </div>
+    <div class="weekdays" id="weekDots"></div>
+  </div>
+
+  <div class="sec"><h2>Сегодня</h2><span class="page-sub" style="margin:0" id="todayCount"></span></div>
+  <div class="acts" id="todayActs"></div>
+  <button class="add" id="addBtn">＋ Добавить тренировку</button>
+</div>
+</div>
+
+<!-- ============ PROGRESS ============ -->
+<div class="page" id="page-progress">
+<div class="wrap page-top">
+  <div class="page-title">Прогресс</div>
+  <div class="page-sub">Как идут дела по неделям и месяцам</div>
+
+  <div class="statgrid">
+    <div class="statcard accent"><div class="v" id="stTotal">0</div><div class="l">Всего тренировок</div></div>
+    <div class="statcard flame"><div class="v" id="stBest">0</div><div class="l">Лучший стрик 🔥</div></div>
+    <div class="statcard"><div class="v" id="stWeek">0%</div><div class="l">Эта неделя</div></div>
+    <div class="statcard gold"><div class="v" id="stMonth">0</div><div class="l">В этом месяце</div></div>
+  </div>
+
+  <div class="histbar">
+    <h3>Тренировки за 8 недель</h3>
+    <div class="bars" id="weekBars"></div>
+  </div>
+
+  <div class="histbar">
+    <h3>Последние 30 дней</h3>
+    <div class="heat-h" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
+      <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+    </div>
+    <div class="heat" id="heatmap"></div>
+    <div class="legend">меньше <i style="background:var(--surface-2)"></i><i style="background:#3a5a1a"></i><i style="background:#7aab2a"></i><i style="background:var(--lime)"></i> больше</div>
+  </div>
+
+  <div class="histbar">
+    <h3>Резервная копия данных</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Данные хранятся только на этом телефоне. Сохраняй копию перед чисткой Safari или сменой телефона.</p>
+    <div style="display:flex;gap:11px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="exportBtn" style="flex:1;min-width:140px;">⬇ Сохранить копию</button>
+      <button class="btn btn-ghost" id="importBtn" style="flex:1;min-width:140px;">⬆ Восстановить</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+  </div>
+</div>
+</div>
+
+<!-- ============ RECORDS ============ -->
+<div class="page" id="page-records">
+<div class="wrap page-top">
+  <div class="page-title">Рекорды</div>
+  <div class="page-sub">Топовые недели, месяцы и достижения</div>
+
+  <div class="sec" style="margin-top:6px"><h2>🏆 Топ-недели</h2></div>
+  <div id="topWeeks"></div>
+
+  <div class="sec"><h2>📅 Топ-месяцы</h2></div>
+  <div id="topMonths"></div>
+
+  <div class="sec"><h2>🎖 Достижения</h2></div>
+  <div class="badges" id="badges"></div>
+</div>
+</div>
+
+<!-- ============ NAV ============ -->
+<nav class="nav"><div class="nav-in wrap" style="padding:0 18px">
+  <button class="nav-btn active" data-page="today">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    Сегодня
+  </button>
+  <button class="nav-btn" data-page="progress">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16v-7"/></svg>
+    Прогресс
+  </button>
+  <button class="nav-btn" data-page="records">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8v4a4 4 0 01-8 0V4z"/><path d="M8 5H5v2a3 3 0 003 3M16 5h3v2a3 3 0 01-3 3M9 16h6M10 20h4M12 12v4"/></svg>
+    Рекорды
+  </button>
+</div></nav>
+
+<!-- ============ MODAL ============ -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3 id="modalTitle">Новая тренировка</h3>
+    <div class="field">
+      <label>Название</label>
+      <input type="text" id="inpName" placeholder="ЛФК, волейбол, падел…" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Иконка</label>
+      <div class="emojis" id="emojiPick"></div>
+    </div>
+    <div class="field">
+      <label>Цвет</label>
+      <div class="colors" id="colorPick"></div>
+    </div>
+    <div class="field">
+      <label>Цель в неделю</label>
+      <div class="stepper">
+        <button id="goalMinus">−</button>
+        <div class="num"><span id="goalVal">3</span><small>раз в неделю</small></div>
+        <button id="goalPlus">＋</button>
+      </div>
+    </div>
+    <div class="sheet-btns">
+      <button class="btn btn-ghost" id="cancelBtn">Отмена</button>
+      <button class="btn btn-primary" id="saveBtn">Сохранить</button>
+    </div>
+    <button class="btn btn-danger" id="deleteBtn" style="margin-top:6px;display:none;width:100%">Удалить тренировку</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ STORAGE ============
+const KEY='tempo_app_v1';
+const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||defaults();}catch(e){return defaults();}}
+function defaults(){return{activities:[
+  {id:id(),name:'ЛФК',emoji:'🧘',color:'#36c9ff',goal:7},
+  {id:id(),name:'Волейбол',emoji:'🏐',color:'#ff5a36',goal:2},
+  {id:id(),name:'Падел',emoji:'🎾',color:'#c8ff3d',goal:2}
+],log:{}};}// log: {date:{actId:true}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function id(){return Math.random().toString(36).slice(2,9);}
+let state=load();
+
+// ============ DATE HELPERS ============
+const DOW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const MON=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const MONFULL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+function dkey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
+function weekDates(monday){return [...Array(7)].map((_,i)=>{const d=new Date(monday);d.setDate(d.getDate()+i);return d;});}
+function countDay(dk){const day=state.log[dk];return day?Object.keys(day).filter(k=>day[k]).length:0;}
+
+// ============ RENDER TODAY ============
+function render(){
+  const now=new Date();
+  document.getElementById('todayDate').textContent=now.getDate()+' '+MON[now.getMonth()]+', '+DOW[(now.getDay()+6)%7];
+  const tk=todayKey();
+  const log=state.log[tk]||{};
+
+  // week progress
+  const mon=mondayOf(now), wds=weekDates(mon);
+  let weekGoal=0, weekDone=0;
+  state.activities.forEach(a=>{
+    weekGoal+=a.goal;
+    wds.forEach(d=>{const l=state.log[dkey(d)];if(l&&l[a.id])weekDone++;});
+  });
+  const pct=weekGoal?Math.min(100,Math.round(weekDone/weekGoal*100)):0;
+  document.getElementById('weekDone').textContent=weekDone;
+  document.getElementById('weekGoal').textContent=weekGoal;
+  document.getElementById('ringPct').textContent=pct+'%';
+  const circ=364.4;
+  document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);
+  const msgs={0:'Свежая неделя. Первая тренировка — самая важная.',low:'Хорошее начало. Держи ритм.',mid:'Больше половины пути. Не сбавляй!',high:'Почти у цели — финишная прямая 💪',full:'Неделя закрыта на 100%. Машина! 🔥'};
+  let m=msgs.low;if(pct===0)m=msgs[0];else if(pct>=100)m=msgs.full;else if(pct>=75)m=msgs.high;else if(pct>=45)m=msgs.mid;
+  document.getElementById('heroMsg').textContent=m;
+
+  // streak
+  const st=calcStreak();
+  document.getElementById('streakNum').textContent=st.current;
+
+  // week dots
+  const wd=document.getElementById('weekDots');wd.innerHTML='';
+  wds.forEach((d,i)=>{
+    const c=countDay(dkey(d));
+    const isToday=dkey(d)===tk;
+    const planned=state.activities.length;
+    let cls='wd';if(c>0&&c>=Math.ceil(plannedFor(d))) cls+=' done';else if(c>0)cls+=' partial';if(isToday)cls+=' today';
+    const div=document.createElement('div');div.className=cls;
+    div.innerHTML=`<div class="wd-name">${DOW[i]}</div><div class="wd-dot">${c>0?(c>=plannedFor(d)?'✓':c):d.getDate()}</div>`;
+    wd.appendChild(div);
+  });
+
+  // today activities
+  const ta=document.getElementById('todayActs');ta.innerHTML='';
+  const doneToday=state.activities.filter(a=>log[a.id]).length;
+  document.getElementById('todayCount').textContent=state.activities.length?`${doneToday}/${state.activities.length} готово`:'';
+  if(!state.activities.length){
+    ta.innerHTML='<div class="empty">Пока нет тренировок.<br>Нажми «Добавить», чтобы создать первую.</div>';
+  }
+  state.activities.forEach(a=>{
+    const done=!!log[a.id];
+    const weekN=weekCountFor(a.id);
+    const fillPct=a.goal?Math.min(100,weekN/a.goal*100):0;
+    const el=document.createElement('div');
+    el.className='act'+(done?' complete':'');
+    el.innerHTML=`
+      <div class="act-bar" style="background:${a.color}"></div>
+      <div class="act-icon">${a.emoji}</div>
+      <div class="act-body">
+        <div class="act-name">${esc(a.name)}</div>
+        <div class="act-prog">${weekN}/${a.goal} на этой неделе</div>
+        <div class="act-track"><div class="act-fill" style="width:${fillPct}%;background:${a.color}"></div></div>
+      </div>
+      <button class="act-btn" data-toggle="${a.id}">${done?'✓':''}</button>`;
+    el.querySelector('.act-icon').addEventListener('click',()=>openEdit(a.id));
+    el.querySelector('.act-name').addEventListener('click',()=>openEdit(a.id));
+    ta.appendChild(el);
+  });
+  document.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.toggle)));
+}
+function plannedFor(d){return Math.max(1,Math.round(state.activities.reduce((s,a)=>s+a.goal,0)/7));}
+function weekCountFor(actId){const mon=mondayOf(new Date());let n=0;weekDates(mon).forEach(d=>{const l=state.log[dkey(d)];if(l&&l[actId])n++;});return n;}
+
+function toggle(actId){
+  const tk=todayKey();
+  if(!state.log[tk])state.log[tk]={};
+  const was=state.log[tk][actId];
+  if(was){delete state.log[tk][actId];if(!Object.keys(state.log[tk]).length)delete state.log[tk];}
+  else{state.log[tk][actId]=true;}
+  save();
+  if(!was){
+    const a=state.activities.find(x=>x.id===actId);
+    haptic();
+    burst(a.color);
+    // check week complete
+    let wg=0,wd=0;const mon=mondayOf(new Date()),wds=weekDates(mon);
+    state.activities.forEach(x=>{wg+=x.goal;wds.forEach(d=>{const l=state.log[dkey(d)];if(l&&l[x.id])wd++;});});
+    if(wg&&wd>=wg)toast('🎉 Неделя закрыта на 100%!');
+    else toast('Засчитано: '+a.name+' '+a.emoji);
+  }
+  render();
+}
+
+// ============ STREAK ============
+function calcStreak(){
+  let current=0;const d=new Date();d.setHours(0,0,0,0);
+  // today counts only if something done; allow today empty (don't break)
+  if(countDay(dkey(d))===0)d.setDate(d.getDate()-1);
+  while(countDay(dkey(d))>0){current++;d.setDate(d.getDate()-1);}
+  // best
+  let best=0;const dates=Object.keys(state.log).filter(k=>countDay(k)>0).sort();
+  if(dates.length){let run=1;best=1;for(let i=1;i<dates.length;i++){
+    const prev=new Date(dates[i-1]),cur=new Date(dates[i]);
+    const diff=(cur-prev)/86400000;
+    if(diff===1){run++;}else{run=1;}if(run>best)best=run;
+  }}
+  return{current,best:Math.max(best,current)};
+}
+
+// ============ PROGRESS PAGE ============
+function renderProgress(){
+  const total=Object.keys(state.log).reduce((s,k)=>s+countDay(k),0);
+  document.getElementById('stTotal').textContent=total;
+  document.getElementById('stBest').textContent=calcStreak().best;
+  const mon=mondayOf(new Date());let wg=0,wd=0;
+  state.activities.forEach(a=>{wg+=a.goal;weekDates(mon).forEach(d=>{const l=state.log[dkey(d)];if(l&&l[a.id])wd++;});});
+  document.getElementById('stWeek').textContent=(wg?Math.min(100,Math.round(wd/wg*100)):0)+'%';
+  const now=new Date();let mc=0;Object.keys(state.log).forEach(k=>{const d=new Date(k);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())mc+=countDay(k);});
+  document.getElementById('stMonth').textContent=mc;
+
+  // 8 week bars
+  const bars=document.getElementById('weekBars');bars.innerHTML='';
+  const weeks=[];let m=mondayOf(now);
+  for(let i=7;i>=0;i--){const wm=new Date(m);wm.setDate(wm.getDate()-i*7);weeks.push(wm);}
+  const counts=weeks.map(wm=>weekDates(wm).reduce((s,d)=>s+countDay(dkey(d)),0));
+  const max=Math.max(...counts,1);
+  weeks.forEach((wm,i)=>{
+    const h=counts[i]/max*100;
+    const col=document.createElement('div');col.className='bar-col';
+    const isCur=i===weeks.length-1;
+    col.innerHTML=`<div class="bar" style="height:${Math.max(h,3)}%;background:${isCur?'var(--lime)':counts[i]?'var(--lime-dim)':'var(--surface-2)'}">${counts[i]?`<span class="bar-val">${counts[i]}</span>`:''}</div><div class="bar-lbl">${wm.getDate()}/${wm.getMonth()+1}</div>`;
+    bars.appendChild(col);
+  });
+
+  // heatmap last 30 days (aligned to weeks)
+  const heat=document.getElementById('heatmap');heat.innerHTML='';
+  const start=mondayOf(new Date());start.setDate(start.getDate()-28);
+  for(let i=0;i<35;i++){
+    const d=new Date(start);d.setDate(d.getDate()+i);
+    const c=countDay(dkey(d));const future=d>new Date();
+    const cell=document.createElement('div');cell.className='heat-cell';
+    let bg='var(--surface-2)';
+    if(c>=4)bg='var(--lime)';else if(c>=2)bg='#7aab2a';else if(c>=1)bg='#3a5a1a';
+    cell.style.background=future?'transparent':bg;
+    cell.style.color=c>=2?'#0a0a0f':'var(--muted)';
+    cell.textContent=future?'':d.getDate();
+    if(c>=2)cell.style.fontWeight='800';
+    heat.appendChild(cell);
+  }
+}
+
+// ============ RECORDS PAGE ============
+function renderRecords(){
+  // top weeks
+  const weekMap={};
+  Object.keys(state.log).forEach(k=>{
+    const wm=dkey(mondayOf(new Date(k)));
+    weekMap[wm]=(weekMap[wm]||0)+countDay(k);
+  });
+  const tw=Object.entries(weekMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+  const twEl=document.getElementById('topWeeks');twEl.innerHTML='';
+  if(!tw.length)twEl.innerHTML='<div class="empty">Закрой несколько тренировок — здесь появятся лучшие недели.</div>';
+  tw.forEach(([wm,c],i)=>{
+    const d=new Date(wm);const end=new Date(d);end.setDate(end.getDate()+6);
+    twEl.innerHTML+=`<div class="rec"><div class="rec-medal">${medals[i]}</div><div class="rec-body"><div class="rec-title">${d.getDate()} ${MON[d.getMonth()]} – ${end.getDate()} ${MON[end.getMonth()]}</div><div class="rec-sub">Неделя</div></div><div class="rec-val">${c}</div></div>`;
+  });
+
+  // top months
+  const monthMap={};
+  Object.keys(state.log).forEach(k=>{const d=new Date(k);const mk=d.getFullYear()+'-'+d.getMonth();monthMap[mk]=(monthMap[mk]||0)+countDay(k);});
+  const tm=Object.entries(monthMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const tmEl=document.getElementById('topMonths');tmEl.innerHTML='';
+  if(!tm.length)tmEl.innerHTML='<div class="empty">Пока недостаточно данных за месяц.</div>';
+  tm.forEach(([mk,c],i)=>{
+    const [y,mo]=mk.split('-');
+    tmEl.innerHTML+=`<div class="rec"><div class="rec-medal">${medals[i]}</div><div class="rec-body"><div class="rec-title">${MONFULL[+mo]} ${y}</div><div class="rec-sub">Месяц</div></div><div class="rec-val">${c}</div></div>`;
+  });
+
+  // badges
+  const total=Object.keys(state.log).reduce((s,k)=>s+countDay(k),0);
+  const best=calcStreak().best;
+  const maxWeek=Math.max(0,...Object.values(weekMap));
+  const defs=[
+    {emo:'🌱',n:'Старт',d:'Первая тренировка',ok:total>=1},
+    {emo:'🔥',n:'На волне',d:'Стрик 3 дня',ok:best>=3},
+    {emo:'⚡️',n:'Неделя',d:'Стрик 7 дней',ok:best>=7},
+    {emo:'💪',n:'Полтинник',d:'50 тренировок',ok:total>=50},
+    {emo:'💯',n:'Сотня',d:'100 тренировок',ok:total>=100},
+    {emo:'🏐',n:'Мультиспорт',d:'3+ вида спорта',ok:state.activities.length>=3},
+    {emo:'🚀',n:'Ударная неделя',d:'10+ за неделю',ok:maxWeek>=10},
+    {emo:'👑',n:'Месяц силы',d:'30 за месяц',ok:Math.max(0,...Object.values(monthMap))>=30},
+    {emo:'🧊',n:'Железная воля',d:'Стрик 14 дней',ok:best>=14},
+  ];
+  const b=document.getElementById('badges');b.innerHTML='';
+  defs.forEach(x=>{b.innerHTML+=`<div class="badge${x.ok?' earned':''}"><div class="emo">${x.emo}</div><div class="bn">${x.n}</div><div class="bd">${x.d}</div></div>`;});
+}
+
+// ============ MODAL ============
+const EMOJIS=['🧘','🏐','🎾','🏃','🏋️','🚴','🏊','⚽️','🏀','🥊','🤸','🧗','⛹️','🏓','🏸','🤾','🚶','🤼','🛹','⛸'];
+const COLORS=['#c8ff3d','#36c9ff','#ff5a36','#9d6cff','#ffce47','#3ddc84','#ff7ab8','#ff9a3d'];
+let editId=null, pickEmo=EMOJIS[0], pickCol=COLORS[0], pickGoal=3;
+
+function buildPickers(){
+  const ep=document.getElementById('emojiPick');ep.innerHTML='';
+  EMOJIS.forEach(e=>{const d=document.createElement('button');d.className='emo-pick'+(e===pickEmo?' sel':'');d.textContent=e;d.onclick=()=>{pickEmo=e;buildPickers();};ep.appendChild(d);});
+  const cp=document.getElementById('colorPick');cp.innerHTML='';
+  COLORS.forEach(c=>{const d=document.createElement('button');d.className='col-pick'+(c===pickCol?' sel':'');d.style.background=c;d.onclick=()=>{pickCol=c;buildPickers();};cp.appendChild(d);});
+  document.getElementById('goalVal').textContent=pickGoal;
+}
+function openAdd(){editId=null;pickEmo=EMOJIS[0];pickCol=COLORS[0];pickGoal=3;
+  document.getElementById('modalTitle').textContent='Новая тренировка';
+  document.getElementById('inpName').value='';
+  document.getElementById('deleteBtn').style.display='none';
+  buildPickers();openModal();}
+function openEdit(aid){const a=state.activities.find(x=>x.id===aid);if(!a)return;
+  editId=aid;pickEmo=a.emoji;pickCol=a.color;pickGoal=a.goal;
+  document.getElementById('modalTitle').textContent='Тренировка';
+  document.getElementById('inpName').value=a.name;
+  document.getElementById('deleteBtn').style.display='block';
+  buildPickers();openModal();}
+function openModal(){document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function saveAct(){
+  const name=document.getElementById('inpName').value.trim()||'Тренировка';
+  if(editId){const a=state.activities.find(x=>x.id===editId);a.name=name;a.emoji=pickEmo;a.color=pickCol;a.goal=pickGoal;}
+  else{state.activities.push({id:id(),name,emoji:pickEmo,color:pickCol,goal:pickGoal});}
+  save();closeModal();render();toast(editId?'Сохранено':'Тренировка добавлена');
+}
+function deleteAct(){if(!editId)return;
+  state.activities=state.activities.filter(x=>x.id!==editId);
+  Object.keys(state.log).forEach(k=>{if(state.log[k][editId])delete state.log[k][editId];});
+  save();closeModal();render();toast('Удалено');
+}
+
+// ============ EFFECTS ============
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1900);}
+function haptic(){if(navigator.vibrate)navigator.vibrate(12);}
+function burst(color){
+  for(let i=0;i<14;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.background=i%3?color:'#fff';
+    c.style.left=(45+Math.random()*10)+'%';c.style.top='55%';
+    c.style.borderRadius=Math.random()>.5?'50%':'2px';
+    document.body.appendChild(c);
+    const ang=Math.random()*Math.PI*2,vel=60+Math.random()*120;
+    const dx=Math.cos(ang)*vel,dy=Math.sin(ang)*vel-80;
+    c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${dx}px,${dy+200}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:900+Math.random()*400,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>c.remove();
+  }
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+// ============ BACKUP: EXPORT / IMPORT ============
+function exportData(){
+  const payload={app:'tempo',version:1,exportedAt:new Date().toISOString(),data:state};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const d=new Date();
+  const fname='tempo-backup-'+dkey(d)+'.json';
+  const a=document.createElement('a');
+  a.href=url;a.download=fname;document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},500);
+  toast('Копия сохранена 💾');
+}
+function importData(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      const incoming=parsed&&parsed.data?parsed.data:parsed;
+      if(!incoming||!Array.isArray(incoming.activities)||typeof incoming.log!=='object'){
+        toast('Файл не подходит ❌');return;
+      }
+      if(!confirm('Восстановить данные из файла? Текущие данные на телефоне будут заменены.'))return;
+      state={activities:incoming.activities,log:incoming.log||{}};
+      save();render();
+      const p=document.querySelector('.nav-btn.active');if(p&&p.dataset.page==='progress')renderProgress();
+      toast('Данные восстановлены ✅');
+    }catch(e){toast('Не удалось прочитать файл ❌');}
+  };
+  reader.readAsText(file);
+}
+
+// ============ NAV ============
+document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const p=b.dataset.page;
+  document.getElementById('page-'+p).classList.add('active');
+  if(p==='progress')renderProgress();
+  if(p==='records')renderRecords();
+  window.scrollTo(0,0);
+}));
+
+document.getElementById('addBtn').addEventListener('click',openAdd);
+document.getElementById('cancelBtn').addEventListener('click',closeModal);
+document.getElementById('saveBtn').addEventListener('click',saveAct);
+document.getElementById('deleteBtn').addEventListener('click',deleteAct);
+document.getElementById('goalMinus').addEventListener('click',()=>{pickGoal=Math.max(1,pickGoal-1);document.getElementById('goalVal').textContent=pickGoal;});
+document.getElementById('goalPlus').addEventListener('click',()=>{pickGoal=Math.min(14,pickGoal+1);document.getElementById('goalVal').textContent=pickGoal;});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+
+// backup buttons
+document.getElementById('exportBtn').addEventListener('click',exportData);
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importData(f);e.target.value='';});
+
+// register SW
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+
+render();
+</script>
+</body>
+</html>
