@@ -129,7 +129,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .bars{display:flex;align-items:flex-end;gap:8px;height:130px;}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end;}
 .bar{width:100%;background:var(--surface-2);border-radius:6px 6px 3px 3px;min-height:4px;transition:height .5s;position:relative;}
-.bar-lbl{font-size:11px;color:var(--muted);font-weight:700;}
+.bar-lbl{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;}
 .bar-val{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;font-weight:800;color:var(--text);}
 .heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px;}
 .heat-cell{aspect-ratio:1;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;}
@@ -265,7 +265,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
     <div class="statcard"><div class="v" id="stWeek">0%</div><div class="l">Эта неделя</div></div>
     <div class="statcard gold"><div class="v" id="stMonth">0</div><div class="l">В этом месяце</div></div>
   </div>
-  <div class="histbar"><h3>Тренировки по неделям</h3><p class="hint">Каждый столбик — одна неделя (последний справа — текущая). Число под ним — дата начала недели, день/месяц.</p><div class="bars" id="weekBars"></div></div>
+  <div class="histbar"><h3>Тренировки по неделям</h3><div class="bars" id="weekBars"></div></div>
   <div class="histbar">
     <h3>Последние недели</h3>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;font-size:10px;color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;" id="heatHead"></div>
@@ -697,7 +697,9 @@ function renderProgress(){
   weeks.forEach((wm,i)=>{
     const h=counts[i]/max*100;const isCur=i===weeks.length-1;
     const col=document.createElement('div');col.className='bar-col';
-    col.innerHTML='<div class="bar" style="height:'+Math.max(h,3)+'%;background:'+(isCur?'var(--bar-cur)':counts[i]?'var(--bar)':'var(--surface-2)')+'">'+(counts[i]?'<span class="bar-val">'+counts[i]+'</span>':'')+'</div><div class="bar-lbl"'+(isCur?' style="color:var(--accent-ink);font-weight:800"':'')+'>'+wm.getDate()+'/'+(wm.getMonth()+1)+'</div>';
+    const ago=weeks.length-1-i;
+    const lbl=isCur?'Эта':ago+' нед.';
+    col.innerHTML='<div class="bar" style="height:'+Math.max(h,3)+'%;background:'+(isCur?'var(--bar-cur)':counts[i]?'var(--bar)':'var(--surface-2)')+'">'+(counts[i]?'<span class="bar-val">'+counts[i]+'</span>':'')+'</div><div class="bar-lbl"'+(isCur?' style="color:var(--accent-ink);font-weight:800"':'')+'>'+lbl+'</div>';
     bars.appendChild(col);
   });
 
