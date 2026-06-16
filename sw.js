@@ -1,4 +1,4 @@
-const CACHE='tempo-v2';
+const CACHE='tempo-v3';
 const ASSETS=['index.html','manifest.json','icon-180.png','icon-512.png'];
 self.addEventListener('install',e=>{
   self.skipWaiting();

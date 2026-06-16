@@ -191,8 +191,8 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .btn-ghost{background:var(--surface-2);color:var(--text);}
 .btn-danger{background:none;color:var(--flame);}
 
-.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120px);bottom:calc(env(safe-area-inset-bottom) + 90px);background:var(--lime);color:var(--on-accent);padding:13px 22px;border-radius:100px;font-weight:800;font-size:15px;z-index:200;transition:transform .35s cubic-bezier(.2,.9,.2,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
-.toast.show{transform:translateX(-50%) translateY(0);}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 96px);transform:translateX(-50%) translateY(16px);opacity:0;visibility:hidden;pointer-events:none;background:var(--lime);color:var(--on-accent);padding:13px 22px;border-radius:100px;font-weight:800;font-size:15px;z-index:200;transition:opacity .3s ease,transform .3s cubic-bezier(.2,.9,.2,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
 .empty{text-align:center;color:var(--muted);padding:34px 20px;font-size:15px;line-height:1.5;}
 .confetti{position:fixed;width:10px;height:10px;z-index:150;pointer-events:none;}
 </style>
@@ -279,16 +279,6 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
       <button class="btn btn-ghost" id="copyCodeBtn" style="flex:0 0 auto;padding:14px 16px;">Копировать</button>
     </div>
     <button class="btn btn-ghost" id="enterCodeBtn" style="width:100%;margin-top:11px;">Ввести код с другого устройства</button>
-  </div>
-
-  <div class="histbar">
-    <h3>Резервная копия в файл</h3>
-    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Дополнительная страховка: выгрузи все данные в файл и храни его где угодно.</p>
-    <div style="display:flex;gap:11px;flex-wrap:wrap;">
-      <button class="btn btn-primary" id="exportBtn" style="flex:1;min-width:140px;">⬇ Сохранить копию</button>
-      <button class="btn btn-ghost" id="importBtn" style="flex:1;min-width:140px;">⬆ Восстановить</button>
-    </div>
-    <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
   </div>
 </div>
 </div>
@@ -855,26 +845,6 @@ function rerenderActive(){
   if(pg==='today')render();else if(pg==='progress')renderProgress();else if(pg==='records')renderRecords();
 }
 
-// ============ BACKUP ============
-function exportData(){
-  const payload={app:'tempo',version:2,exportedAt:new Date().toISOString(),data:state};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download='tempo-backup-'+todayKey()+'.json';document.body.appendChild(a);a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},500);toast('Копия сохранена 💾');
-}
-function importData(file){
-  const r=new FileReader();
-  r.onload=()=>{try{
-    const parsed=JSON.parse(r.result);const inc=parsed&&parsed.data?parsed.data:parsed;
-    const mig=migrate(inc);
-    if(!mig||!Array.isArray(mig.types)){toast('Файл не подходит ❌');return;}
-    if(!confirm('Восстановить данные из файла? Текущие данные заменятся.'))return;
-    state=mig;save();applyTheme();render();toast('Данные восстановлены ✅');
-  }catch(e){toast('Не удалось прочитать файл ❌');}};
-  r.readAsText(file);
-}
-
 // ============ WIRING ============
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
@@ -907,10 +877,6 @@ document.getElementById('tCancel').addEventListener('click',()=>closeModal('type
 document.getElementById('tSave').addEventListener('click',saveType);
 document.getElementById('tDelete').addEventListener('click',deleteType);
 document.getElementById('typeModal').addEventListener('click',e=>{if(e.target.id==='typeModal')closeModal('typeModal');});
-
-document.getElementById('exportBtn').addEventListener('click',exportData);
-document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
-document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importData(f);e.target.value='';});
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 applyTheme();
