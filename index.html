@@ -743,28 +743,78 @@ function renderRecords(){
   const goal=state.settings.weeklyGoal||4;
   const perfectWeeks=Object.values(wm).filter(c=>c>=goal).length;
   const activeWeeks=Object.keys(wm).length;
-  let notes=0,planned=false;const tk=todayKey();
-  Object.keys(state.sessions).forEach(dk=>state.sessions[dk].forEach(s=>{if(s.note)notes++;if(!s.done&&dk>tk)planned=true;}));
+  const activeMonths=Object.keys(mm).length;
+  const activeDays=Object.keys(allDoneDates()).length;
+  const maxDay=Math.max(0,...Object.values(allDoneDates()));
+  const doneTypes=new Set();let notes=0,planned=false;const tk=todayKey();
+  Object.keys(state.sessions).forEach(dk=>state.sessions[dk].forEach(s=>{if(s.note)notes++;if(s.done)doneTypes.add(s.typeId);if(!s.done&&dk>tk)planned=true;}));
   if(state.repeats.length)planned=true;
+  let cp=0,run=0,prevK=null;
+  Object.keys(wm).sort().forEach(k=>{
+    if(wm[k]>=goal){run=(prevK&&(parseDk(k)-parseDk(prevK))/86400000===7)?run+1:1;prevK=k;}
+    else{run=0;prevK=null;}
+    if(run>cp)cp=run;
+  });
+  const T=state.types.length;
   const defs=[
+    // тренировки всего
     {emo:'🌱',n:'Старт',d:'Первая тренировка',ok:total>=1},
-    {emo:'🔥',n:'На волне',d:'Стрик 3 дня',ok:best>=3},
-    {emo:'⚡️',n:'Неделя огня',d:'Стрик 7 дней',ok:best>=7},
-    {emo:'🧊',n:'Железная воля',d:'Стрик 14 дней',ok:best>=14},
-    {emo:'💎',n:'Несокрушимый',d:'Стрик 30 дней',ok:best>=30},
+    {emo:'👟',n:'Первые шаги',d:'5 тренировок',ok:total>=5},
+    {emo:'🔟',n:'Десятка',d:'10 тренировок',ok:total>=10},
+    {emo:'📦',n:'Четвертак',d:'25 тренировок',ok:total>=25},
     {emo:'💪',n:'Полтинник',d:'50 тренировок',ok:total>=50},
+    {emo:'🎽',n:'Семьдесят пять',d:'75 тренировок',ok:total>=75},
     {emo:'💯',n:'Сотня',d:'100 тренировок',ok:total>=100},
-    {emo:'🏆',n:'Двести',d:'200 тренировок',ok:total>=200},
-    {emo:'🏐',n:'Мультиспорт',d:'3+ вида спорта',ok:state.types.length>=3},
-    {emo:'🤹',n:'Универсал',d:'5+ видов спорта',ok:state.types.length>=5},
-    {emo:'🚀',n:'Ударная неделя',d:'10+ за неделю',ok:maxWeek>=10},
-    {emo:'👑',n:'Месяц силы',d:'30 за месяц',ok:maxMonth>=30},
+    {emo:'🔥',n:'Полтораста',d:'150 тренировок',ok:total>=150},
+    {emo:'🏆',n:'Две с половиной',d:'250 тренировок',ok:total>=250},
+    {emo:'👑',n:'Пятьсот',d:'500 тренировок',ok:total>=500},
+    // стрик
+    {emo:'🔥',n:'На волне',d:'Стрик 3 дня',ok:best>=3},
+    {emo:'✋',n:'Пятёрка',d:'Стрик 5 дней',ok:best>=5},
+    {emo:'⚡️',n:'Неделя огня',d:'Стрик 7 дней',ok:best>=7},
+    {emo:'🎯',n:'Десятидневка',d:'Стрик 10 дней',ok:best>=10},
+    {emo:'🧊',n:'Железная воля',d:'Стрик 14 дней',ok:best>=14},
+    {emo:'🗓',n:'Три недели',d:'Стрик 21 день',ok:best>=21},
+    {emo:'💎',n:'Месяц подряд',d:'Стрик 30 дней',ok:best>=30},
+    {emo:'🏅',n:'Полста подряд',d:'Стрик 50 дней',ok:best>=50},
+    {emo:'♾️',n:'Сто дней',d:'Стрик 100 дней',ok:best>=100},
+    // активные дни
+    {emo:'📅',n:'Десять дней',d:'10 дней спорта',ok:activeDays>=10},
+    {emo:'📆',n:'Месяц движения',d:'30 дней спорта',ok:activeDays>=30},
+    {emo:'🗒',n:'Сотня дней',d:'100 дней спорта',ok:activeDays>=100},
+    {emo:'📈',n:'Двести дней',d:'200 дней спорта',ok:activeDays>=200},
+    // идеальные недели
     {emo:'✅',n:'Идеальная неделя',d:'Выполнил цель недели',ok:perfectWeeks>=1},
     {emo:'🎯',n:'Месяц по плану',d:'4 идеальные недели',ok:perfectWeeks>=4},
-    {emo:'📈',n:'Постоянство',d:'Тренировки в 8 недель',ok:activeWeeks>=8},
+    {emo:'🏔',n:'Восемь идеалов',d:'8 идеальных недель',ok:perfectWeeks>=8},
+    {emo:'🌗',n:'Квартал силы',d:'12 идеальных недель',ok:perfectWeeks>=12},
+    {emo:'🌓',n:'Полгода идеала',d:'26 идеальных недель',ok:perfectWeeks>=26},
+    {emo:'🌕',n:'Год силы',d:'52 идеальные недели',ok:perfectWeeks>=52},
+    {emo:'🔗',n:'Серия недель',d:'4 идеальные недели подряд',ok:cp>=4},
+    {emo:'⛓️',n:'Длинная серия',d:'8 идеальных недель подряд',ok:cp>=8},
+    // активность по неделям/месяцам
+    {emo:'📊',n:'Постоянство',d:'Активность в 8 недель',ok:activeWeeks>=8},
+    {emo:'📚',n:'Полгода в строю',d:'Активность в 26 недель',ok:activeWeeks>=26},
+    {emo:'🌙',n:'Три месяца',d:'Активность в 3 месяца',ok:activeMonths>=3},
+    {emo:'🌛',n:'Полгода активности',d:'Активность в 6 месяцев',ok:activeMonths>=6},
+    {emo:'🎆',n:'Год активности',d:'Активность в 12 месяцев',ok:activeMonths>=12},
+    // интенсивность
+    {emo:'🚀',n:'Ударная неделя',d:'10+ за неделю',ok:maxWeek>=10},
+    {emo:'🌪️',n:'Шторм',d:'15+ за неделю',ok:maxWeek>=15},
+    {emo:'👑',n:'Месяц силы',d:'30 за месяц',ok:maxMonth>=30},
+    {emo:'🏰',n:'Большой месяц',d:'50 за месяц',ok:maxMonth>=50},
+    {emo:'⚡️',n:'Двойной день',d:'2 тренировки за день',ok:maxDay>=2},
+    {emo:'🔋',n:'Тройной день',d:'3 тренировки за день',ok:maxDay>=3},
+    // разнообразие
+    {emo:'🏐',n:'Мультиспорт',d:'3+ вида спорта',ok:T>=3},
+    {emo:'🤹',n:'Универсал',d:'5+ видов спорта',ok:T>=5},
+    {emo:'🎨',n:'Коллекционер',d:'8+ видов спорта',ok:T>=8},
+    {emo:'🌈',n:'Разнообразие',d:'3 разных вида выполнено',ok:doneTypes.size>=3},
+    // план и заметки
     {emo:'📝',n:'Планировщик',d:'Заметка к тренировке',ok:notes>=1},
-    {emo:'🗓',n:'Стратег',d:'Планируешь наперёд',ok:planned},
-    {emo:'♾️',n:'Полугодие',d:'12 идеальных недель',ok:perfectWeeks>=12},
+    {emo:'📒',n:'Дневник',d:'20 заметок',ok:notes>=20},
+    {emo:'🗓️',n:'Стратег',d:'Планируешь наперёд',ok:planned},
+    {emo:'🔁',n:'Режим',d:'Создан повтор',ok:state.repeats.length>=1},
   ];
   const earned=defs.filter(x=>x.ok).length;
   document.getElementById('badgeCount').textContent=earned+'/'+defs.length;
