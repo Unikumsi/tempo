@@ -821,6 +821,7 @@ function renderRecords(){
   ];
   const earned=defs.filter(x=>x.ok).length;
   document.getElementById('badgeCount').textContent=earned+'/'+defs.length;
+  defs.sort((a,b)=>(b.ok?1:0)-(a.ok?1:0)); // выполненные — наверх (стабильно)
   const b=document.getElementById('badges');b.innerHTML='';
   defs.forEach(x=>{b.innerHTML+='<div class="badge'+(x.ok?' earned':'')+'"><div class="emo">'+x.emo+'</div><div class="bn">'+x.n+'</div><div class="bd">'+x.d+'</div></div>';});
 }
