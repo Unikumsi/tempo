@@ -10,108 +10,117 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Темп — спортивный трекер</title>
+<script>try{var s=JSON.parse(localStorage.getItem('tempo_app_v1'));if(s&&s.settings&&s.settings.theme)document.documentElement.dataset.theme=s.settings.theme;}catch(e){}</script>
 <style>
 :root{
-  --bg:#0a0a0f;
-  --surface:#15151f;
-  --surface-2:#1e1e2c;
-  --line:#2a2a3a;
-  --text:#f2f2f7;
-  --muted:#8b8b9e;
-  --lime:#c8ff3d;
-  --lime-dim:#9bc62e;
-  --flame:#ff5a36;
-  --ice:#36c9ff;
-  --violet:#9d6cff;
-  --gold:#ffce47;
-  --ok:#3ddc84;
+  --bg:#0a0a0f;--surface:#15151f;--surface-2:#1e1e2c;--line:#2a2a3a;
+  --text:#f2f2f7;--muted:#8b8b9e;
+  --lime:#c8ff3d;--lime-dim:#9bc62e;--flame:#ff5a36;--ice:#36c9ff;--violet:#9d6cff;--gold:#ffce47;--ok:#3ddc84;
+  --on-accent:#0a0a0f;
+}
+html[data-theme="light"]{
+  --bg:#f4f4f8;--surface:#ffffff;--surface-2:#ececf3;--line:#e0e0ea;
+  --text:#16161e;--muted:#76768a;
+  --lime-dim:#7aab2a;--on-accent:#0a0a0f;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;}
-body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
+body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);transition:background .3s;}
 .wrap{max-width:520px;margin:0 auto;padding:0 18px;}
 
-/* ===== Header ===== */
-.top{padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:8px;display:flex;align-items:flex-end;justify-content:space-between;}
+/* Header */
+.top{padding-top:calc(env(safe-area-inset-top) + 16px);padding-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
 .brand{font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);font-weight:700;}
-.date{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;margin-top:6px;}
-.streak{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);padding:8px 13px;border-radius:100px;font-weight:700;font-size:15px;}
+.top-actions{display:flex;align-items:center;gap:10px;}
+.streak{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line);padding:7px 12px;border-radius:100px;font-weight:700;font-size:14px;}
 .streak b{color:var(--flame);}
+.iconbtn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.iconbtn svg{width:20px;height:20px;}
 
-/* ===== Week ring hero ===== */
-.hero{margin-top:22px;background:linear-gradient(160deg,#181826,#101019);border:1px solid var(--line);border-radius:28px;padding:24px;position:relative;overflow:hidden;}
+/* Day navigator */
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+.daynav .arrow{width:46px;height:46px;flex:0 0 auto;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.daynav .arrow:active{transform:scale(.92);}
+.daynav .dcenter{flex:1;text-align:center;cursor:pointer;}
+.daynav .drel{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);font-weight:800;}
+.daynav .ddate{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:2px;}
+
+/* Hero ring */
+.hero{margin-top:18px;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--line);border-radius:28px;padding:22px;position:relative;overflow:hidden;}
 .hero::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(200,255,61,.14),transparent 70%);}
-.hero-row{display:flex;align-items:center;gap:22px;position:relative;}
-.ring{flex:0 0 132px;width:132px;height:132px;position:relative;}
+.hero-row{display:flex;align-items:center;gap:20px;position:relative;}
+.ring{flex:0 0 120px;width:120px;height:120px;position:relative;}
 .ring svg{transform:rotate(-90deg);}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-pct{font-size:32px;font-weight:850;letter-spacing:-.03em;line-height:1;}
-.ring-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.16em;margin-top:4px;font-weight:700;}
+.ring-pct{font-size:30px;font-weight:850;letter-spacing:-.03em;line-height:1;}
+.ring-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-top:4px;font-weight:700;}
 .hero-info{flex:1;}
-.hero-label{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);font-weight:800;}
-.hero-count{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:4px;}
-.hero-count small{font-size:18px;color:var(--muted);font-weight:700;}
-.hero-msg{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.4;}
-
-/* week dots */
-.weekdays{display:flex;justify-content:space-between;margin-top:22px;position:relative;}
-.wd{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;}
-.wd-name{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.hero-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);font-weight:800;}
+.hero-count{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:4px;}
+.hero-count small{font-size:17px;color:var(--muted);font-weight:700;}
+.hero-msg{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.4;}
+.weekdays{display:flex;justify-content:space-between;margin-top:20px;}
+.wd{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;cursor:pointer;}
+.wd-name{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;}
 .wd-dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted);transition:.3s;}
-.wd.done .wd-dot{background:var(--lime);border-color:var(--lime);color:#0a0a0f;}
+.wd.done .wd-dot{background:var(--lime);border-color:var(--lime);color:var(--on-accent);}
 .wd.partial .wd-dot{border-color:var(--lime);color:var(--lime);}
+.wd.sel .wd-dot{box-shadow:0 0 0 3px rgba(200,255,61,.25);}
 .wd.today .wd-name{color:var(--text);}
-.wd.today .wd-dot{box-shadow:0 0 0 3px rgba(200,255,61,.2);}
 
-/* ===== Section title ===== */
-.sec{display:flex;align-items:baseline;justify-content:space-between;margin:30px 4px 14px;}
-.sec h2{font-size:20px;font-weight:800;letter-spacing:-.01em;}
-.sec .link{font-size:14px;color:var(--lime);font-weight:700;background:none;border:none;cursor:pointer;}
+/* Section */
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 4px 12px;}
+.sec h2{font-size:19px;font-weight:800;letter-spacing:-.01em;}
+.sec .cnt{font-size:13px;color:var(--muted);font-weight:600;}
 
-/* ===== Activity cards ===== */
-.acts{display:flex;flex-direction:column;gap:12px;}
-.act{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 16px 16px 18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:.2s;}
+/* Session cards */
+.acts{display:flex;flex-direction:column;gap:11px;}
+.act{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 14px 16px;display:flex;align-items:center;gap:13px;position:relative;overflow:hidden;}
 .act-bar{position:absolute;left:0;top:0;bottom:0;width:5px;}
-.act-icon{flex:0 0 46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface-2);}
-.act-body{flex:1;min-width:0;}
-.act-name{font-size:17px;font-weight:750;letter-spacing:-.01em;}
-.act-prog{font-size:13px;color:var(--muted);margin-top:3px;font-weight:600;}
-.act-track{height:6px;background:var(--surface-2);border-radius:6px;margin-top:9px;overflow:hidden;}
-.act-fill{height:100%;border-radius:6px;transition:width .4s cubic-bezier(.2,.8,.2,1);}
-.act-btn{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);color:var(--text);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.act-icon{flex:0 0 44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:23px;background:var(--surface-2);cursor:pointer;}
+.act-body{flex:1;min-width:0;cursor:pointer;}
+.act-name{font-size:16px;font-weight:750;letter-spacing:-.01em;display:flex;align-items:center;gap:7px;}
+.act-name .rep{font-size:11px;color:var(--violet);font-weight:800;}
+.act-note{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35;white-space:pre-wrap;word-break:break-word;}
+.act-meta{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600;}
+.act-btn{flex:0 0 auto;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);color:var(--text);font-size:21px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
 .act-btn:active{transform:scale(.88);}
-.act.complete .act-btn{background:var(--ok);border-color:var(--ok);color:#0a0a0f;}
+.act.complete .act-btn{background:var(--ok);border-color:var(--ok);color:var(--on-accent);}
 .act.complete .act-name{color:var(--muted);}
-.act-undo{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;display:none;}
+.act.virtual{border-style:dashed;}
 
-/* ===== Add button ===== */
-.add{margin-top:14px;width:100%;background:var(--surface);border:1px dashed var(--line);border-radius:20px;padding:17px;color:var(--muted);font-size:15px;font-weight:700;cursor:pointer;transition:.2s;}
+.add{margin-top:12px;width:100%;background:var(--surface);border:1px dashed var(--line);border-radius:18px;padding:16px;color:var(--muted);font-size:15px;font-weight:700;cursor:pointer;}
 .add:active{transform:scale(.98);}
 
-/* ===== Bottom nav ===== */
-.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,15,.86);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:10px 0 calc(env(safe-area-inset-bottom) + 10px);display:flex;justify-content:center;gap:6px;z-index:50;}
+/* tomorrow peek */
+.peek{margin-top:24px;}
+.peek h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:0 4px 10px;}
+.peek-item{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;cursor:pointer;}
+.peek-item .pi-ic{font-size:18px;}
+.peek-item .pi-n{font-size:14px;font-weight:700;}
+.peek-empty{color:var(--muted);font-size:13px;padding:6px 4px;}
+
+/* Nav */
+.nav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:10px 0 calc(env(safe-area-inset-bottom) + 10px);display:flex;justify-content:center;z-index:50;}
 .nav-in{display:flex;width:100%;max-width:520px;}
 .nav-btn{flex:1;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px;}
 .nav-btn svg{width:24px;height:24px;}
 .nav-btn.active{color:var(--lime);}
 
-/* ===== Pages ===== */
 .page{display:none;padding-bottom:120px;}
 .page.active{display:block;}
 .page-top{padding-top:calc(env(safe-area-inset-top) + 22px);}
 .page-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
 .page-sub{font-size:14px;color:var(--muted);margin-bottom:22px;}
 
-/* stats cards */
 .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .statcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;}
-.statcard .v{font-size:32px;font-weight:850;letter-spacing:-.03em;}
-.statcard .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-top:4px;}
+.statcard .v{font-size:30px;font-weight:850;letter-spacing:-.03em;}
+.statcard .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px;}
 .statcard.accent .v{color:var(--lime);}
 .statcard.flame .v{color:var(--flame);}
 .statcard.gold .v{color:var(--gold);}
 
-/* history bars */
 .histbar{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px;}
 .histbar h3{font-size:15px;font-weight:750;margin-bottom:16px;}
 .bars{display:flex;align-items:flex-end;gap:8px;height:130px;}
@@ -119,61 +128,72 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
 .bar{width:100%;background:var(--surface-2);border-radius:6px 6px 3px 3px;min-height:4px;transition:height .5s;position:relative;}
 .bar-lbl{font-size:11px;color:var(--muted);font-weight:700;}
 .bar-val{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;font-weight:800;color:var(--text);}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px;}
+.heat-cell{aspect-ratio:1;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;}
+.legend{display:flex;align-items:center;gap:7px;justify-content:flex-end;margin-top:14px;font-size:11px;color:var(--muted);}
+.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;}
 
-/* records list */
 .rec{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px 16px;margin-top:11px;}
 .rec-medal{font-size:26px;}
 .rec-body{flex:1;}
 .rec-title{font-size:16px;font-weight:750;}
 .rec-sub{font-size:13px;color:var(--muted);margin-top:2px;}
 .rec-val{font-size:20px;font-weight:850;color:var(--gold);}
-
-/* badges */
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:6px;}
 .badge{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 8px;text-align:center;opacity:.32;filter:grayscale(1);transition:.3s;}
 .badge.earned{opacity:1;filter:none;border-color:var(--violet);}
-.badge .emo{font-size:30px;}
+.badge .emo{font-size:28px;}
 .badge .bn{font-size:12px;font-weight:750;margin-top:7px;}
 .badge .bd{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
 
-/* calendar heatmap */
-.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px;}
-.heat-cell{aspect-ratio:1;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;}
-.heat-h{font-size:10px;color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;padding-bottom:2px;}
-.legend{display:flex;align-items:center;gap:7px;justify-content:flex-end;margin-top:14px;font-size:11px;color:var(--muted);}
-.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;}
-
-/* ===== Modal ===== */
+/* Modal / sheet */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center;}
 .modal.open{display:flex;}
-.sheet{background:var(--surface);width:100%;max-width:520px;border-radius:28px 28px 0 0;padding:26px 22px calc(env(safe-area-inset-bottom) + 26px);border:1px solid var(--line);border-bottom:none;animation:up .3s cubic-bezier(.2,.9,.2,1);}
+.sheet{background:var(--surface);width:100%;max-width:520px;border-radius:28px 28px 0 0;padding:24px 22px calc(env(safe-area-inset-bottom) + 24px);border:1px solid var(--line);border-bottom:none;animation:up .3s cubic-bezier(.2,.9,.2,1);max-height:90vh;overflow-y:auto;}
 @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet h3{font-size:22px;font-weight:800;margin-bottom:18px;}
+.sheet h3{font-size:21px;font-weight:800;margin-bottom:18px;}
 .field{margin-bottom:16px;}
 .field label{font-size:13px;color:var(--muted);font-weight:700;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
-.field input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:17px;font-family:inherit;}
-.field input:focus{outline:none;border-color:var(--lime);}
+.field input,.field textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:16px;font-family:inherit;}
+.field textarea{min-height:84px;resize:vertical;line-height:1.4;}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--lime);}
+.typechips{display:flex;flex-wrap:wrap;gap:8px;}
+.tchip{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:2px solid transparent;border-radius:13px;padding:9px 13px;font-size:15px;font-weight:700;cursor:pointer;}
+.tchip.sel{border-color:var(--lime);}
+.tchip .tx{font-size:18px;}
+.tchip.addnew{color:var(--muted);}
 .emojis{display:flex;flex-wrap:wrap;gap:8px;}
-.emo-pick{width:46px;height:46px;border-radius:13px;background:var(--surface-2);border:2px solid transparent;font-size:23px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.emo-pick.sel{border-color:var(--lime);background:var(--surface);}
+.emo-pick{width:44px;height:44px;border-radius:13px;background:var(--surface-2);border:2px solid transparent;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.emo-pick.sel{border-color:var(--lime);}
 .colors{display:flex;gap:10px;flex-wrap:wrap;}
-.col-pick{width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+.col-pick{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
 .col-pick.sel{border-color:var(--text);}
 .stepper{display:flex;align-items:center;gap:16px;}
 .stepper button{width:46px;height:46px;border-radius:13px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);font-size:24px;font-weight:700;cursor:pointer;}
-.stepper .num{font-size:28px;font-weight:850;min-width:54px;text-align:center;}
-.stepper .num small{font-size:14px;color:var(--muted);font-weight:600;display:block;}
-.sheet-btns{display:flex;gap:11px;margin-top:24px;}
-.btn{flex:1;border:none;border-radius:15px;padding:16px;font-size:16px;font-weight:750;cursor:pointer;font-family:inherit;}
-.btn-primary{background:var(--lime);color:#0a0a0f;}
+.stepper .num{font-size:26px;font-weight:850;min-width:50px;text-align:center;}
+.stepper .num small{font-size:13px;color:var(--muted);font-weight:600;display:block;}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:4px;gap:4px;}
+.seg button{flex:1;border:none;background:none;color:var(--muted);font-weight:750;font-size:15px;padding:11px;border-radius:10px;cursor:pointer;font-family:inherit;}
+.seg button.on{background:var(--lime);color:var(--on-accent);}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:13px 15px;cursor:pointer;}
+.toggle .tlabel{font-size:15px;font-weight:700;}
+.toggle .tsw{width:50px;height:30px;border-radius:100px;background:var(--line);position:relative;transition:.2s;flex:0 0 auto;}
+.toggle .tsw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;}
+.toggle.on .tsw{background:var(--lime);}
+.toggle.on .tsw::after{left:23px;}
+.typerow{display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:9px;cursor:pointer;}
+.typerow .tr-ic{font-size:20px;}
+.typerow .tr-n{flex:1;font-size:15px;font-weight:700;}
+.typerow .tr-e{font-size:13px;color:var(--muted);font-weight:700;}
+.sheet-btns{display:flex;gap:11px;margin-top:22px;}
+.btn{flex:1;border:none;border-radius:15px;padding:15px;font-size:16px;font-weight:750;cursor:pointer;font-family:inherit;}
+.btn-primary{background:var(--lime);color:var(--on-accent);}
 .btn-ghost{background:var(--surface-2);color:var(--text);}
 .btn-danger{background:none;color:var(--flame);}
 
-/* toast */
-.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120px);bottom:calc(env(safe-area-inset-bottom) + 90px);background:var(--lime);color:#0a0a0f;padding:13px 22px;border-radius:100px;font-weight:800;font-size:15px;z-index:200;transition:transform .35s cubic-bezier(.2,.9,.2,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120px);bottom:calc(env(safe-area-inset-bottom) + 90px);background:var(--lime);color:var(--on-accent);padding:13px 22px;border-radius:100px;font-weight:800;font-size:15px;z-index:200;transition:transform .35s cubic-bezier(.2,.9,.2,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
 .toast.show{transform:translateX(-50%) translateY(0);}
-
-.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:15px;line-height:1.5;}
+.empty{text-align:center;color:var(--muted);padding:34px 20px;font-size:15px;line-height:1.5;}
 .confetti{position:fixed;width:10px;height:10px;z-index:150;pointer-events:none;}
 </style>
 </head>
@@ -183,40 +203,51 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
 <div class="page active" id="page-today">
 <div class="wrap">
   <div class="top">
-    <div>
-      <div class="brand">Темп</div>
-      <div class="date" id="todayDate">—</div>
+    <div class="brand">Темп</div>
+    <div class="top-actions">
+      <div class="streak">🔥 <b id="streakNum">0</b></div>
+      <button class="iconbtn" id="settingsBtn" aria-label="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
-    <div class="streak">🔥 <b id="streakNum">0</b> дней</div>
+  </div>
+
+  <div class="daynav">
+    <button class="arrow" id="prevDay">‹</button>
+    <div class="dcenter" id="dayCenter">
+      <div class="drel" id="dayRel">Сегодня</div>
+      <div class="ddate" id="dayDate">—</div>
+    </div>
+    <button class="arrow" id="nextDay">›</button>
   </div>
 
   <div class="hero">
     <div class="hero-row">
       <div class="ring">
-        <svg width="132" height="132" viewBox="0 0 132 132">
-          <circle cx="66" cy="66" r="58" fill="none" stroke="#2a2a3a" stroke-width="11"/>
-          <circle id="ringFill" cx="66" cy="66" r="58" fill="none" stroke="url(#g)" stroke-width="11" stroke-linecap="round" stroke-dasharray="364.4" stroke-dashoffset="364.4"/>
-          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#c8ff3d"/><stop offset="1" stop-color="#3ddc84"/>
-          </linearGradient></defs>
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <circle id="ringFill" cx="60" cy="60" r="52" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8ff3d"/><stop offset="1" stop-color="#3ddc84"/></linearGradient></defs>
         </svg>
-        <div class="ring-center">
-          <div class="ring-pct" id="ringPct">0%</div>
-          <div class="ring-sub">неделя</div>
-        </div>
+        <div class="ring-center"><div class="ring-pct" id="ringPct">0%</div><div class="ring-sub">неделя</div></div>
       </div>
       <div class="hero-info">
         <div class="hero-label">Прогресс недели</div>
         <div class="hero-count"><span id="weekDone">0</span><small>/<span id="weekGoal">0</span> трен.</small></div>
-        <div class="hero-msg" id="heroMsg">Добавь тренировки и начни неделю.</div>
+        <div class="hero-msg" id="heroMsg">Запланируй тренировки и начни неделю.</div>
       </div>
     </div>
     <div class="weekdays" id="weekDots"></div>
   </div>
 
-  <div class="sec"><h2>Сегодня</h2><span class="page-sub" style="margin:0" id="todayCount"></span></div>
+  <div class="sec"><h2 id="dayHeading">На сегодня</h2><span class="cnt" id="todayCount"></span></div>
   <div class="acts" id="todayActs"></div>
   <button class="add" id="addBtn">＋ Добавить тренировку</button>
+
+  <div class="peek">
+    <h3 id="peekTitle">Завтра</h3>
+    <div id="peekList"></div>
+  </div>
 </div>
 </div>
 
@@ -225,24 +256,16 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
 <div class="wrap page-top">
   <div class="page-title">Прогресс</div>
   <div class="page-sub">Как идут дела по неделям и месяцам</div>
-
   <div class="statgrid">
     <div class="statcard accent"><div class="v" id="stTotal">0</div><div class="l">Всего тренировок</div></div>
     <div class="statcard flame"><div class="v" id="stBest">0</div><div class="l">Лучший стрик 🔥</div></div>
     <div class="statcard"><div class="v" id="stWeek">0%</div><div class="l">Эта неделя</div></div>
     <div class="statcard gold"><div class="v" id="stMonth">0</div><div class="l">В этом месяце</div></div>
   </div>
-
+  <div class="histbar"><h3>Тренировки за 8 недель</h3><div class="bars" id="weekBars"></div></div>
   <div class="histbar">
-    <h3>Тренировки за 8 недель</h3>
-    <div class="bars" id="weekBars"></div>
-  </div>
-
-  <div class="histbar">
-    <h3>Последние 30 дней</h3>
-    <div class="heat-h" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
-      <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
-    </div>
+    <h3>Последние недели</h3>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;font-size:10px;color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;" id="heatHead"></div>
     <div class="heat" id="heatmap"></div>
     <div class="legend">меньше <i style="background:var(--surface-2)"></i><i style="background:#3a5a1a"></i><i style="background:#7aab2a"></i><i style="background:var(--lime)"></i> больше</div>
   </div>
@@ -275,180 +298,290 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
 <div class="wrap page-top">
   <div class="page-title">Рекорды</div>
   <div class="page-sub">Топовые недели, месяцы и достижения</div>
-
   <div class="sec" style="margin-top:6px"><h2>🏆 Топ-недели</h2></div>
   <div id="topWeeks"></div>
-
   <div class="sec"><h2>📅 Топ-месяцы</h2></div>
   <div id="topMonths"></div>
-
-  <div class="sec"><h2>🎖 Достижения</h2></div>
+  <div class="sec"><h2>🎖 Достижения</h2><span class="cnt" id="badgeCount"></span></div>
   <div class="badges" id="badges"></div>
 </div>
 </div>
 
 <!-- ============ NAV ============ -->
 <nav class="nav"><div class="nav-in wrap" style="padding:0 18px">
-  <button class="nav-btn active" data-page="today">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-    Сегодня
-  </button>
-  <button class="nav-btn" data-page="progress">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16v-7"/></svg>
-    Прогресс
-  </button>
-  <button class="nav-btn" data-page="records">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8v4a4 4 0 01-8 0V4z"/><path d="M8 5H5v2a3 3 0 003 3M16 5h3v2a3 3 0 01-3 3M9 16h6M10 20h4M12 12v4"/></svg>
-    Рекорды
-  </button>
+  <button class="nav-btn active" data-page="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Сегодня</button>
+  <button class="nav-btn" data-page="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16v-7"/></svg>Прогресс</button>
+  <button class="nav-btn" data-page="records"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8v4a4 4 0 01-8 0V4z"/><path d="M8 5H5v2a3 3 0 003 3M16 5h3v2a3 3 0 01-3 3M9 16h6M10 20h4M12 12v4"/></svg>Рекорды</button>
 </div></nav>
 
-<!-- ============ MODAL ============ -->
+<!-- ============ SESSION MODAL ============ -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <h3 id="modalTitle">Новая тренировка</h3>
+    <h3 id="modalTitle">Тренировка</h3>
     <div class="field">
-      <label>Название</label>
-      <input type="text" id="inpName" placeholder="ЛФК, волейбол, падел…" autocomplete="off">
+      <label>Вид спорта</label>
+      <div class="typechips" id="typeChips"></div>
+    </div>
+    <div id="newTypeBox" style="display:none;">
+      <div class="field"><label>Название вида</label><input type="text" id="inpTypeName" placeholder="Бег, йога, бокс…" autocomplete="off"></div>
+      <div class="field"><label>Иконка</label><div class="emojis" id="emojiPick"></div></div>
+      <div class="field"><label>Цвет</label><div class="colors" id="colorPick"></div></div>
     </div>
     <div class="field">
-      <label>Иконка</label>
-      <div class="emojis" id="emojiPick"></div>
+      <label>Заметка / план тренировки</label>
+      <textarea id="inpNote" placeholder="Упражнения, вес, повторы, цель…"></textarea>
     </div>
-    <div class="field">
-      <label>Цвет</label>
-      <div class="colors" id="colorPick"></div>
-    </div>
-    <div class="field">
-      <label>Цель в неделю</label>
-      <div class="stepper">
-        <button id="goalMinus">−</button>
-        <div class="num"><span id="goalVal">3</span><small>раз в неделю</small></div>
-        <button id="goalPlus">＋</button>
-      </div>
+    <div class="field" id="repeatField">
+      <label>Повтор</label>
+      <div class="toggle" id="repeatToggle"><div class="tlabel" id="repeatLabel">Повторять каждую неделю</div><div class="tsw"></div></div>
     </div>
     <div class="sheet-btns">
       <button class="btn btn-ghost" id="cancelBtn">Отмена</button>
       <button class="btn btn-primary" id="saveBtn">Сохранить</button>
     </div>
-    <button class="btn btn-danger" id="deleteBtn" style="margin-top:6px;display:none;width:100%">Удалить тренировку</button>
+    <button class="btn btn-danger" id="deleteBtn" style="margin-top:6px;display:none;width:100%">Удалить</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal" id="settingsModal">
+  <div class="sheet">
+    <h3>Настройки</h3>
+    <div class="field">
+      <label>Цель тренировок в неделю</label>
+      <div class="stepper">
+        <button id="goalMinus">−</button>
+        <div class="num"><span id="goalVal">4</span><small>для «успешной недели»</small></div>
+        <button id="goalPlus">＋</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Тема</label>
+      <div class="seg" id="themeSeg"><button data-theme="dark">Тёмная</button><button data-theme="light">Светлая</button></div>
+    </div>
+    <div class="field">
+      <label>Неделя начинается с</label>
+      <div class="seg" id="weekSeg"><button data-ws="mon">Понедельника</button><button data-ws="sun">Воскресенья</button></div>
+    </div>
+    <div class="field">
+      <label>Виды спорта</label>
+      <div id="typeList"></div>
+      <button class="btn btn-ghost" id="addTypeBtn" style="width:100%;margin-top:4px;">＋ Добавить вид спорта</button>
+    </div>
+    <div class="sheet-btns"><button class="btn btn-primary" id="settingsClose">Готово</button></div>
+  </div>
+</div>
+
+<!-- ============ TYPE EDIT MODAL ============ -->
+<div class="modal" id="typeModal">
+  <div class="sheet">
+    <h3 id="typeModalTitle">Вид спорта</h3>
+    <div class="field"><label>Название</label><input type="text" id="tName" placeholder="Бег, йога, бокс…" autocomplete="off"></div>
+    <div class="field"><label>Иконка</label><div class="emojis" id="tEmoji"></div></div>
+    <div class="field"><label>Цвет</label><div class="colors" id="tColor"></div></div>
+    <div class="sheet-btns">
+      <button class="btn btn-ghost" id="tCancel">Отмена</button>
+      <button class="btn btn-primary" id="tSave">Сохранить</button>
+    </div>
+    <button class="btn btn-danger" id="tDelete" style="margin-top:6px;display:none;width:100%">Удалить вид (и его тренировки)</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ============ STORAGE ============
+// ============ STORAGE & MIGRATION ============
 const KEY='tempo_app_v1';
-const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||defaults();}catch(e){return defaults();}}
-function defaults(){return{activities:[
-  {id:id(),name:'ЛФК',emoji:'🧘',color:'#36c9ff',goal:7},
-  {id:id(),name:'Волейбол',emoji:'🏐',color:'#ff5a36',goal:2},
-  {id:id(),name:'Падел',emoji:'🎾',color:'#c8ff3d',goal:2}
-],log:{}};}// log: {date:{actId:true}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));if(window.__cloudPush)window.__cloudPush(state);}
-window.__getState=()=>state;
-window.__applyRemote=function(s){state=s;localStorage.setItem(KEY,JSON.stringify(state));render();const p=document.querySelector('.nav-btn.active');if(p){if(p.dataset.page==='progress')renderProgress();if(p.dataset.page==='records')renderRecords();}};
 function id(){return Math.random().toString(36).slice(2,9);}
+function defaults(){
+  return {version:2,
+    types:[
+      {id:id(),name:'ЛФК',emoji:'🧘',color:'#36c9ff'},
+      {id:id(),name:'Волейбол',emoji:'🏐',color:'#ff5a36'},
+      {id:id(),name:'Падел',emoji:'🎾',color:'#c8ff3d'}
+    ],
+    sessions:{}, repeats:[],
+    settings:{weeklyGoal:4, theme:'dark', weekStart:'mon'}
+  };
+}
+function migrate(o){
+  if(!o) return defaults();
+  if(o.version===2){
+    o.settings=o.settings||{weeklyGoal:4,theme:'dark',weekStart:'mon'};
+    if(o.settings.weeklyGoal==null)o.settings.weeklyGoal=4;
+    if(!o.settings.theme)o.settings.theme='dark';
+    if(!o.settings.weekStart)o.settings.weekStart='mon';
+    o.types=o.types||[]; o.sessions=o.sessions||{}; o.repeats=o.repeats||[];
+    return o;
+  }
+  // v1 -> v2
+  const s=defaults(); s.sessions={};
+  if(Array.isArray(o.activities)){
+    s.types=o.activities.map(a=>({id:a.id,name:a.name,emoji:a.emoji,color:a.color}));
+    const sum=o.activities.reduce((x,a)=>x+(a.goal||0),0);
+    s.settings.weeklyGoal=Math.min(14,Math.max(1,Math.round(sum)))||4;
+  }
+  if(o.log){
+    Object.keys(o.log).forEach(dk=>{
+      const day=o.log[dk]; const arr=[];
+      Object.keys(day).forEach(tid=>{ if(day[tid]) arr.push({id:id(),typeId:tid,note:'',done:true}); });
+      if(arr.length) s.sessions[dk]=arr;
+    });
+  }
+  return s;
+}
+function load(){try{return migrate(JSON.parse(localStorage.getItem(KEY)));}catch(e){return defaults();}}
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify(state));}
+function save(){saveLocal();if(window.__cloudPush)window.__cloudPush(state);}
 let state=load();
+// cloud bridges
+window.__getState=()=>state;
+window.__applyRemote=function(s){
+  const before=JSON.stringify(s);
+  state=migrate(s);
+  saveLocal();
+  applyTheme();
+  rerenderActive();
+  if(JSON.stringify(state)!==before && window.__cloudPush) window.__cloudPush(state); // upgraded shape
+};
 
 // ============ DATE HELPERS ============
-const DOW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 const MON=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
 const MONFULL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-function dkey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
-function weekDates(monday){return [...Array(7)].map((_,i)=>{const d=new Date(monday);d.setDate(d.getDate()+i);return d;});}
-function countDay(dk){const day=state.log[dk];return day?Object.keys(day).filter(k=>day[k]).length:0;}
+function pad(n){return String(n).padStart(2,'0');}
+function dkey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function todayKey(){return dkey(new Date());}
+function parseDk(dk){const[y,m,d]=dk.split('-').map(Number);return new Date(y,m-1,d);}
+function monIdx(d){return (d.getDay()+6)%7;} // Mon=0..Sun=6
+function dowLabels(){return state.settings.weekStart==='sun'?['Вс','Пн','Вт','Ср','Чт','Пт','Сб']:['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];}
+function startOfWeek(d){
+  const x=new Date(d);x.setHours(0,0,0,0);
+  const wd=x.getDay();
+  const diff=state.settings.weekStart==='sun'?wd:(wd+6)%7;
+  x.setDate(x.getDate()-diff);return x;
+}
+function weekDates(start){return [...Array(7)].map((_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return d;});}
+function typeById(tid){return state.types.find(t=>t.id===tid);}
 
-// ============ RENDER TODAY ============
-function render(){
-  const now=new Date();
-  document.getElementById('todayDate').textContent=now.getDate()+' '+MON[now.getMonth()]+', '+DOW[(now.getDay()+6)%7];
-  const tk=todayKey();
-  const log=state.log[tk]||{};
-
-  // week progress
-  const mon=mondayOf(now), wds=weekDates(mon);
-  let weekGoal=0, weekDone=0;
-  state.activities.forEach(a=>{
-    weekGoal+=a.goal;
-    wds.forEach(d=>{const l=state.log[dkey(d)];if(l&&l[a.id])weekDone++;});
+// sessions for a date = explicit + virtual from repeats
+function sessionsFor(dk){
+  const explicit=(state.sessions[dk]||[]).slice();
+  const wd=monIdx(parseDk(dk));
+  const virt=[];
+  state.repeats.forEach(r=>{
+    if(r.weekday===wd && dk>=(r.from||'0') && !(r.skips||[]).includes(dk)){
+      if(!explicit.some(s=>s.repeatId===r.id))
+        virt.push({id:'v_'+r.id+'_'+dk,virtual:true,repeatId:r.id,typeId:r.typeId,note:r.note||'',done:false});
+    }
   });
-  const pct=weekGoal?Math.min(100,Math.round(weekDone/weekGoal*100)):0;
+  return explicit.concat(virt);
+}
+function doneCount(dk){return sessionsFor(dk).filter(s=>s.done).length;}
+function plannedCount(dk){return sessionsFor(dk).length;}
+
+// ============ TODAY / DAY VIEW ============
+let viewDate=new Date(); viewDate.setHours(0,0,0,0);
+function relName(dk){
+  const t=todayKey();
+  const diff=Math.round((parseDk(dk)-parseDk(t))/86400000);
+  if(diff===0)return'Сегодня';if(diff===1)return'Завтра';if(diff===-1)return'Вчера';
+  if(diff===2)return'Послезавтра';
+  return null;
+}
+function render(){
+  const dk=dkey(viewDate);
+  const dl=dowLabels();
+  const rel=relName(dk);
+  document.getElementById('dayRel').textContent=rel||['Пн','Вт','Ср','Чт','Пт','Сб','Вс'][monIdx(viewDate)];
+  document.getElementById('dayDate').textContent=viewDate.getDate()+' '+MON[viewDate.getMonth()];
+
+  // week (of viewDate)
+  const start=startOfWeek(viewDate), wds=weekDates(start);
+  const goal=state.settings.weeklyGoal||4;
+  let weekDone=0; wds.forEach(d=>weekDone+=doneCount(dkey(d)));
+  const pct=goal?Math.min(100,Math.round(weekDone/goal*100)):0;
   document.getElementById('weekDone').textContent=weekDone;
-  document.getElementById('weekGoal').textContent=weekGoal;
+  document.getElementById('weekGoal').textContent=goal;
   document.getElementById('ringPct').textContent=pct+'%';
-  const circ=364.4;
-  document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);
-  const msgs={0:'Свежая неделя. Первая тренировка — самая важная.',low:'Хорошее начало. Держи ритм.',mid:'Больше половины пути. Не сбавляй!',high:'Почти у цели — финишная прямая 💪',full:'Неделя закрыта на 100%. Машина! 🔥'};
-  let m=msgs.low;if(pct===0)m=msgs[0];else if(pct>=100)m=msgs.full;else if(pct>=75)m=msgs.high;else if(pct>=45)m=msgs.mid;
+  const circ=326.7; document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);
+  let m='Хорошее начало. Держи ритм.';
+  if(weekDone===0)m='Свежая неделя. Запланируй и начни.';
+  else if(pct>=100)m='Цель недели достигнута. Машина! 🔥';
+  else if(pct>=75)m='Почти у цели — финишная прямая 💪';
+  else if(pct>=45)m='Больше половины. Не сбавляй!';
   document.getElementById('heroMsg').textContent=m;
 
-  // streak
-  const st=calcStreak();
-  document.getElementById('streakNum').textContent=st.current;
+  document.getElementById('streakNum').textContent=calcStreak().current;
 
   // week dots
   const wd=document.getElementById('weekDots');wd.innerHTML='';
   wds.forEach((d,i)=>{
-    const c=countDay(dkey(d));
-    const isToday=dkey(d)===tk;
-    const planned=state.activities.length;
-    let cls='wd';if(c>0&&c>=Math.ceil(plannedFor(d))) cls+=' done';else if(c>0)cls+=' partial';if(isToday)cls+=' today';
-    const div=document.createElement('div');div.className=cls;
-    div.innerHTML=`<div class="wd-name">${DOW[i]}</div><div class="wd-dot">${c>0?(c>=plannedFor(d)?'✓':c):d.getDate()}</div>`;
-    wd.appendChild(div);
+    const k=dkey(d), done=doneCount(k), planned=plannedCount(k);
+    let cls='wd';
+    if(done>0 && done>=planned && planned>0)cls+=' done'; else if(done>0)cls+=' partial';
+    if(k===dk)cls+=' sel'; if(k===todayKey())cls+=' today';
+    const el=document.createElement('div');el.className=cls;
+    el.innerHTML='<div class="wd-name">'+dl[i]+'</div><div class="wd-dot">'+(done>0?(done>=planned?'✓':done):d.getDate())+'</div>';
+    el.addEventListener('click',()=>{viewDate=new Date(d);render();});
+    wd.appendChild(el);
   });
 
-  // today activities
+  // day heading
+  document.getElementById('dayHeading').textContent='На '+(rel?rel.toLowerCase():viewDate.getDate()+' '+MON[viewDate.getMonth()]);
+  const list=sessionsFor(dk);
+  const done=list.filter(s=>s.done).length;
+  document.getElementById('todayCount').textContent=list.length?done+'/'+list.length+' готово':'';
   const ta=document.getElementById('todayActs');ta.innerHTML='';
-  const doneToday=state.activities.filter(a=>log[a.id]).length;
-  document.getElementById('todayCount').textContent=state.activities.length?`${doneToday}/${state.activities.length} готово`:'';
-  if(!state.activities.length){
-    ta.innerHTML='<div class="empty">Пока нет тренировок.<br>Нажми «Добавить», чтобы создать первую.</div>';
+  if(!list.length){
+    ta.innerHTML='<div class="empty">На этот день ничего не запланировано.<br>Нажми «Добавить».</div>';
   }
-  state.activities.forEach(a=>{
-    const done=!!log[a.id];
-    const weekN=weekCountFor(a.id);
-    const fillPct=a.goal?Math.min(100,weekN/a.goal*100):0;
+  list.forEach(s=>{
+    const t=typeById(s.typeId)||{name:'Тренировка',emoji:'🏃',color:'#c8ff3d'};
     const el=document.createElement('div');
-    el.className='act'+(done?' complete':'');
-    el.innerHTML=`
-      <div class="act-bar" style="background:${a.color}"></div>
-      <div class="act-icon">${a.emoji}</div>
-      <div class="act-body">
-        <div class="act-name">${esc(a.name)}</div>
-        <div class="act-prog">${weekN}/${a.goal} на этой неделе</div>
-        <div class="act-track"><div class="act-fill" style="width:${fillPct}%;background:${a.color}"></div></div>
-      </div>
-      <button class="act-btn" data-toggle="${a.id}">${done?'✓':''}</button>`;
-    el.querySelector('.act-icon').addEventListener('click',()=>openEdit(a.id));
-    el.querySelector('.act-name').addEventListener('click',()=>openEdit(a.id));
+    el.className='act'+(s.done?' complete':'')+(s.virtual?' virtual':'');
+    el.innerHTML='<div class="act-bar" style="background:'+t.color+'"></div>'+
+      '<div class="act-icon">'+t.emoji+'</div>'+
+      '<div class="act-body"><div class="act-name">'+esc(t.name)+(s.repeatId?'<span class="rep">↻</span>':'')+'</div>'+
+      (s.note?'<div class="act-note">'+esc(s.note)+'</div>':'')+'</div>'+
+      '<button class="act-btn">'+(s.done?'✓':'')+'</button>';
+    el.querySelector('.act-icon').addEventListener('click',()=>openSession(dk,s));
+    el.querySelector('.act-body').addEventListener('click',()=>openSession(dk,s));
+    el.querySelector('.act-btn').addEventListener('click',()=>toggleSession(dk,s));
     ta.appendChild(el);
   });
-  document.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.toggle)));
-}
-function plannedFor(d){return Math.max(1,Math.round(state.activities.reduce((s,a)=>s+a.goal,0)/7));}
-function weekCountFor(actId){const mon=mondayOf(new Date());let n=0;weekDates(mon).forEach(d=>{const l=state.log[dkey(d)];if(l&&l[actId])n++;});return n;}
 
-function toggle(actId){
-  const tk=todayKey();
-  if(!state.log[tk])state.log[tk]={};
-  const was=state.log[tk][actId];
-  if(was){delete state.log[tk][actId];if(!Object.keys(state.log[tk]).length)delete state.log[tk];}
-  else{state.log[tk][actId]=true;}
+  // peek next day
+  const nd=new Date(viewDate);nd.setDate(nd.getDate()+1);
+  const ndk=dkey(nd);
+  document.getElementById('peekTitle').textContent=(relName(ndk)||(nd.getDate()+' '+MON[nd.getMonth()]));
+  const peek=document.getElementById('peekList');peek.innerHTML='';
+  const pl=sessionsFor(ndk);
+  if(!pl.length){peek.innerHTML='<div class="peek-empty">Ничего не запланировано</div>';}
+  pl.forEach(s=>{
+    const t=typeById(s.typeId)||{name:'Тренировка',emoji:'🏃'};
+    const el=document.createElement('div');el.className='peek-item';
+    el.innerHTML='<span class="pi-ic">'+t.emoji+'</span><span class="pi-n">'+esc(t.name)+'</span>';
+    el.addEventListener('click',()=>{viewDate=new Date(nd);render();});
+    peek.appendChild(el);
+  });
+}
+
+function toggleSession(dk,s){
+  let nowDone;
+  if(s.virtual){
+    state.sessions[dk]=state.sessions[dk]||[];
+    state.sessions[dk].push({id:id(),typeId:s.typeId,note:s.note,done:true,repeatId:s.repeatId});
+    nowDone=true;
+  } else {
+    const arr=state.sessions[dk]||[]; const it=arr.find(x=>x.id===s.id);
+    if(it){it.done=!it.done;nowDone=it.done;}
+  }
   save();
-  if(!was){
-    const a=state.activities.find(x=>x.id===actId);
-    haptic();
-    burst(a.color);
-    // check week complete
-    let wg=0,wd=0;const mon=mondayOf(new Date()),wds=weekDates(mon);
-    state.activities.forEach(x=>{wg+=x.goal;wds.forEach(d=>{const l=state.log[dkey(d)];if(l&&l[x.id])wd++;});});
-    if(wg&&wd>=wg)toast('🎉 Неделя закрыта на 100%!');
-    else toast('Засчитано: '+a.name+' '+a.emoji);
+  if(nowDone){
+    const t=typeById(s.typeId);haptic();if(t)burst(t.color);
+    const start=startOfWeek(viewDate);let wdn=0;weekDates(start).forEach(d=>wdn+=doneCount(dkey(d)));
+    if(wdn>=(state.settings.weeklyGoal||4))toast('🎉 Цель недели достигнута!');
+    else toast('Засчитано'+(t?': '+t.name+' '+t.emoji:''));
   }
   render();
 }
@@ -456,143 +589,246 @@ function toggle(actId){
 // ============ STREAK ============
 function calcStreak(){
   let current=0;const d=new Date();d.setHours(0,0,0,0);
-  // today counts only if something done; allow today empty (don't break)
-  if(countDay(dkey(d))===0)d.setDate(d.getDate()-1);
-  while(countDay(dkey(d))>0){current++;d.setDate(d.getDate()-1);}
-  // best
-  let best=0;const dates=Object.keys(state.log).filter(k=>countDay(k)>0).sort();
+  if(doneCount(dkey(d))===0)d.setDate(d.getDate()-1);
+  while(doneCount(dkey(d))>0){current++;d.setDate(d.getDate()-1);}
+  let best=0;const dates=Object.keys(allDoneDates()).sort();
   if(dates.length){let run=1;best=1;for(let i=1;i<dates.length;i++){
-    const prev=new Date(dates[i-1]),cur=new Date(dates[i]);
-    const diff=(cur-prev)/86400000;
-    if(diff===1){run++;}else{run=1;}if(run>best)best=run;
+    const diff=(parseDk(dates[i])-parseDk(dates[i-1]))/86400000;
+    run=diff===1?run+1:1;if(run>best)best=run;
   }}
   return{current,best:Math.max(best,current)};
 }
+function allDoneDates(){
+  const map={};
+  Object.keys(state.sessions).forEach(dk=>{const c=(state.sessions[dk]||[]).filter(s=>s.done).length;if(c>0)map[dk]=c;});
+  return map;
+}
 
-// ============ PROGRESS PAGE ============
+// ============ SESSION ADD/EDIT ============
+const EMOJIS=['🧘','🏐','🎾','🏃','🏋️','🚴','🏊','⚽️','🏀','🥊','🤸','🧗','⛹️','🏓','🏸','🤾','🚶','🤼','🛹','⛸','🧗‍♀️','🏑','🥋','🎿'];
+const COLORS=['#c8ff3d','#36c9ff','#ff5a36','#9d6cff','#ffce47','#3ddc84','#ff7ab8','#ff9a3d'];
+let sess={dk:null,edit:null,typeId:null,note:'',repeat:false,nt:{on:false,name:'',emoji:EMOJIS[0],color:COLORS[0]}};
+
+function openSession(dk,existing){
+  sess={dk:dk,edit:existing||null,note:existing?existing.note||'':'',repeat:false,
+        typeId:existing?existing.typeId:(state.types[0]?state.types[0].id:null),
+        nt:{on:false,name:'',emoji:EMOJIS[0],color:COLORS[0]}};
+  document.getElementById('modalTitle').textContent=existing?'Тренировка':'Новая тренировка';
+  document.getElementById('inpNote').value=sess.note;
+  document.getElementById('deleteBtn').style.display=existing?'block':'none';
+  // repeat field only for new (non-repeat) sessions
+  const showRepeat=!existing;
+  document.getElementById('repeatField').style.display=showRepeat?'block':'none';
+  const wlabel=['понедельникам','вторникам','средам','четвергам','пятницам','субботам','воскресеньям'][monIdx(parseDk(dk))];
+  document.getElementById('repeatLabel').textContent='Повторять по '+wlabel;
+  document.getElementById('repeatToggle').classList.remove('on');
+  document.getElementById('newTypeBox').style.display='none';
+  buildTypeChips(); buildEmojiColor();
+  openModal('modal');
+}
+function buildTypeChips(){
+  const box=document.getElementById('typeChips');box.innerHTML='';
+  state.types.forEach(t=>{
+    const c=document.createElement('button');c.className='tchip'+(t.id===sess.typeId&&!sess.nt.on?' sel':'');
+    c.innerHTML='<span class="tx">'+t.emoji+'</span>'+esc(t.name);
+    c.onclick=()=>{sess.typeId=t.id;sess.nt.on=false;document.getElementById('newTypeBox').style.display='none';buildTypeChips();};
+    box.appendChild(c);
+  });
+  const add=document.createElement('button');add.className='tchip addnew'+(sess.nt.on?' sel':'');
+  add.innerHTML='＋ Новый';
+  add.onclick=()=>{sess.nt.on=true;sess.typeId=null;document.getElementById('newTypeBox').style.display='block';buildTypeChips();};
+  box.appendChild(add);
+}
+function buildEmojiColor(){
+  const ep=document.getElementById('emojiPick');ep.innerHTML='';
+  EMOJIS.forEach(e=>{const b=document.createElement('button');b.className='emo-pick'+(e===sess.nt.emoji?' sel':'');b.textContent=e;b.onclick=()=>{sess.nt.emoji=e;buildEmojiColor();};ep.appendChild(b);});
+  const cp=document.getElementById('colorPick');cp.innerHTML='';
+  COLORS.forEach(c=>{const b=document.createElement('button');b.className='col-pick'+(c===sess.nt.color?' sel':'');b.style.background=c;b.onclick=()=>{sess.nt.color=c;buildEmojiColor();};cp.appendChild(b);});
+}
+function saveSession(){
+  sess.note=document.getElementById('inpNote').value.trim();
+  let typeId=sess.typeId;
+  if(sess.nt.on){
+    const nm=document.getElementById('inpTypeName').value.trim();
+    if(!nm){toast('Впиши название вида ❌');return;}
+    const nt={id:id(),name:nm,emoji:sess.nt.emoji,color:sess.nt.color};
+    state.types.push(nt);typeId=nt.id;
+  }
+  if(!typeId){toast('Выбери вид спорта ❌');return;}
+  if(sess.edit){
+    if(sess.edit.virtual){
+      // editing a repeat occurrence -> edit whole repeat template
+      const r=state.repeats.find(x=>x.id===sess.edit.repeatId);
+      if(r){r.typeId=typeId;r.note=sess.note;}
+    } else {
+      const arr=state.sessions[sess.dk]||[];const it=arr.find(x=>x.id===sess.edit.id);
+      if(it){it.typeId=typeId;it.note=sess.note;}
+    }
+  } else if(sess.repeat){
+    state.repeats.push({id:id(),typeId:typeId,weekday:monIdx(parseDk(sess.dk)),note:sess.note,from:sess.dk,skips:[]});
+  } else {
+    state.sessions[sess.dk]=state.sessions[sess.dk]||[];
+    state.sessions[sess.dk].push({id:id(),typeId:typeId,note:sess.note,done:false});
+  }
+  save();closeModal('modal');render();toast(sess.edit?'Сохранено':'Добавлено');
+}
+function deleteSession(){
+  const s=sess.edit;if(!s)return;
+  if(s.virtual){
+    if(confirm('Удалить все повторы этой тренировки? «Отмена» — убрать только этот день.')){
+      state.repeats=state.repeats.filter(r=>r.id!==s.repeatId);
+    } else {
+      const r=state.repeats.find(r=>r.id===s.repeatId);if(r){r.skips=r.skips||[];r.skips.push(sess.dk);}
+    }
+  } else {
+    state.sessions[sess.dk]=(state.sessions[sess.dk]||[]).filter(x=>x.id!==s.id);
+    if(!state.sessions[sess.dk].length)delete state.sessions[sess.dk];
+  }
+  save();closeModal('modal');render();toast('Удалено');
+}
+
+// ============ PROGRESS ============
 function renderProgress(){
-  const total=Object.keys(state.log).reduce((s,k)=>s+countDay(k),0);
+  const total=Object.values(allDoneDates()).reduce((a,b)=>a+b,0);
   document.getElementById('stTotal').textContent=total;
   document.getElementById('stBest').textContent=calcStreak().best;
-  const mon=mondayOf(new Date());let wg=0,wd=0;
-  state.activities.forEach(a=>{wg+=a.goal;weekDates(mon).forEach(d=>{const l=state.log[dkey(d)];if(l&&l[a.id])wd++;});});
-  document.getElementById('stWeek').textContent=(wg?Math.min(100,Math.round(wd/wg*100)):0)+'%';
-  const now=new Date();let mc=0;Object.keys(state.log).forEach(k=>{const d=new Date(k);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())mc+=countDay(k);});
+  const start=startOfWeek(new Date());let wd=0;weekDates(start).forEach(d=>wd+=doneCount(dkey(d)));
+  const goal=state.settings.weeklyGoal||4;
+  document.getElementById('stWeek').textContent=(goal?Math.min(100,Math.round(wd/goal*100)):0)+'%';
+  const now=new Date();let mc=0;Object.keys(allDoneDates()).forEach(k=>{const d=parseDk(k);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())mc+=doneCount(k);});
   document.getElementById('stMonth').textContent=mc;
 
-  // 8 week bars
   const bars=document.getElementById('weekBars');bars.innerHTML='';
-  const weeks=[];let m=mondayOf(now);
+  const weeks=[];let m=startOfWeek(now);
   for(let i=7;i>=0;i--){const wm=new Date(m);wm.setDate(wm.getDate()-i*7);weeks.push(wm);}
-  const counts=weeks.map(wm=>weekDates(wm).reduce((s,d)=>s+countDay(dkey(d)),0));
+  const counts=weeks.map(wm=>weekDates(wm).reduce((s,d)=>s+doneCount(dkey(d)),0));
   const max=Math.max(...counts,1);
   weeks.forEach((wm,i)=>{
-    const h=counts[i]/max*100;
+    const h=counts[i]/max*100;const isCur=i===weeks.length-1;
     const col=document.createElement('div');col.className='bar-col';
-    const isCur=i===weeks.length-1;
-    col.innerHTML=`<div class="bar" style="height:${Math.max(h,3)}%;background:${isCur?'var(--lime)':counts[i]?'var(--lime-dim)':'var(--surface-2)'}">${counts[i]?`<span class="bar-val">${counts[i]}</span>`:''}</div><div class="bar-lbl">${wm.getDate()}/${wm.getMonth()+1}</div>`;
+    col.innerHTML='<div class="bar" style="height:'+Math.max(h,3)+'%;background:'+(isCur?'var(--lime)':counts[i]?'var(--lime-dim)':'var(--surface-2)')+'">'+(counts[i]?'<span class="bar-val">'+counts[i]+'</span>':'')+'</div><div class="bar-lbl">'+wm.getDate()+'/'+(wm.getMonth()+1)+'</div>';
     bars.appendChild(col);
   });
 
-  // heatmap last 30 days (aligned to weeks)
+  document.getElementById('heatHead').innerHTML=dowLabels().map(x=>'<div>'+x+'</div>').join('');
   const heat=document.getElementById('heatmap');heat.innerHTML='';
-  const start=mondayOf(new Date());start.setDate(start.getDate()-28);
+  const hs=startOfWeek(new Date());hs.setDate(hs.getDate()-28);
   for(let i=0;i<35;i++){
-    const d=new Date(start);d.setDate(d.getDate()+i);
-    const c=countDay(dkey(d));const future=d>new Date();
+    const d=new Date(hs);d.setDate(d.getDate()+i);
+    const c=doneCount(dkey(d));const future=d>new Date();
     const cell=document.createElement('div');cell.className='heat-cell';
-    let bg='var(--surface-2)';
-    if(c>=4)bg='var(--lime)';else if(c>=2)bg='#7aab2a';else if(c>=1)bg='#3a5a1a';
-    cell.style.background=future?'transparent':bg;
-    cell.style.color=c>=2?'#0a0a0f':'var(--muted)';
-    cell.textContent=future?'':d.getDate();
-    if(c>=2)cell.style.fontWeight='800';
+    let bg='var(--surface-2)';if(c>=4)bg='var(--lime)';else if(c>=2)bg='#7aab2a';else if(c>=1)bg='#3a5a1a';
+    cell.style.background=future?'transparent':bg;cell.style.color=c>=2?'#0a0a0f':'var(--muted)';
+    cell.textContent=future?'':d.getDate();if(c>=2)cell.style.fontWeight='800';
     heat.appendChild(cell);
   }
 }
 
-// ============ RECORDS PAGE ============
+// ============ RECORDS + ACHIEVEMENTS ============
+function weekMapDone(){
+  const m={};Object.keys(allDoneDates()).forEach(k=>{const wk=dkey(startOfWeek(parseDk(k)));m[wk]=(m[wk]||0)+doneCount(k);});return m;
+}
+function monthMapDone(){
+  const m={};Object.keys(allDoneDates()).forEach(k=>{const d=parseDk(k);const mk=d.getFullYear()+'-'+d.getMonth();m[mk]=(m[mk]||0)+doneCount(k);});return m;
+}
 function renderRecords(){
-  // top weeks
-  const weekMap={};
-  Object.keys(state.log).forEach(k=>{
-    const wm=dkey(mondayOf(new Date(k)));
-    weekMap[wm]=(weekMap[wm]||0)+countDay(k);
-  });
-  const tw=Object.entries(weekMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const medals=['🥇','🥈','🥉'];
+  const wm=weekMapDone();
+  const tw=Object.entries(wm).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const twEl=document.getElementById('topWeeks');twEl.innerHTML='';
   if(!tw.length)twEl.innerHTML='<div class="empty">Закрой несколько тренировок — здесь появятся лучшие недели.</div>';
-  tw.forEach(([wm,c],i)=>{
-    const d=new Date(wm);const end=new Date(d);end.setDate(end.getDate()+6);
-    twEl.innerHTML+=`<div class="rec"><div class="rec-medal">${medals[i]}</div><div class="rec-body"><div class="rec-title">${d.getDate()} ${MON[d.getMonth()]} – ${end.getDate()} ${MON[end.getMonth()]}</div><div class="rec-sub">Неделя</div></div><div class="rec-val">${c}</div></div>`;
-  });
+  tw.forEach(([k,c],i)=>{const d=parseDk(k);const e=new Date(d);e.setDate(e.getDate()+6);
+    twEl.innerHTML+='<div class="rec"><div class="rec-medal">'+medals[i]+'</div><div class="rec-body"><div class="rec-title">'+d.getDate()+' '+MON[d.getMonth()]+' – '+e.getDate()+' '+MON[e.getMonth()]+'</div><div class="rec-sub">Неделя</div></div><div class="rec-val">'+c+'</div></div>';});
 
-  // top months
-  const monthMap={};
-  Object.keys(state.log).forEach(k=>{const d=new Date(k);const mk=d.getFullYear()+'-'+d.getMonth();monthMap[mk]=(monthMap[mk]||0)+countDay(k);});
-  const tm=Object.entries(monthMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const mm=monthMapDone();
+  const tm=Object.entries(mm).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const tmEl=document.getElementById('topMonths');tmEl.innerHTML='';
   if(!tm.length)tmEl.innerHTML='<div class="empty">Пока недостаточно данных за месяц.</div>';
-  tm.forEach(([mk,c],i)=>{
-    const [y,mo]=mk.split('-');
-    tmEl.innerHTML+=`<div class="rec"><div class="rec-medal">${medals[i]}</div><div class="rec-body"><div class="rec-title">${MONFULL[+mo]} ${y}</div><div class="rec-sub">Месяц</div></div><div class="rec-val">${c}</div></div>`;
-  });
+  tm.forEach(([k,c],i)=>{const[y,mo]=k.split('-');tmEl.innerHTML+='<div class="rec"><div class="rec-medal">'+medals[i]+'</div><div class="rec-body"><div class="rec-title">'+MONFULL[+mo]+' '+y+'</div><div class="rec-sub">Месяц</div></div><div class="rec-val">'+c+'</div></div>';});
 
-  // badges
-  const total=Object.keys(state.log).reduce((s,k)=>s+countDay(k),0);
+  const total=Object.values(allDoneDates()).reduce((a,b)=>a+b,0);
   const best=calcStreak().best;
-  const maxWeek=Math.max(0,...Object.values(weekMap));
+  const maxWeek=Math.max(0,...Object.values(wm));
+  const maxMonth=Math.max(0,...Object.values(mm));
+  const goal=state.settings.weeklyGoal||4;
+  const perfectWeeks=Object.values(wm).filter(c=>c>=goal).length;
+  const activeWeeks=Object.keys(wm).length;
+  let notes=0,planned=false;const tk=todayKey();
+  Object.keys(state.sessions).forEach(dk=>state.sessions[dk].forEach(s=>{if(s.note)notes++;if(!s.done&&dk>tk)planned=true;}));
+  if(state.repeats.length)planned=true;
   const defs=[
     {emo:'🌱',n:'Старт',d:'Первая тренировка',ok:total>=1},
     {emo:'🔥',n:'На волне',d:'Стрик 3 дня',ok:best>=3},
-    {emo:'⚡️',n:'Неделя',d:'Стрик 7 дней',ok:best>=7},
+    {emo:'⚡️',n:'Неделя огня',d:'Стрик 7 дней',ok:best>=7},
+    {emo:'🧊',n:'Железная воля',d:'Стрик 14 дней',ok:best>=14},
+    {emo:'💎',n:'Несокрушимый',d:'Стрик 30 дней',ok:best>=30},
     {emo:'💪',n:'Полтинник',d:'50 тренировок',ok:total>=50},
     {emo:'💯',n:'Сотня',d:'100 тренировок',ok:total>=100},
-    {emo:'🏐',n:'Мультиспорт',d:'3+ вида спорта',ok:state.activities.length>=3},
+    {emo:'🏆',n:'Двести',d:'200 тренировок',ok:total>=200},
+    {emo:'🏐',n:'Мультиспорт',d:'3+ вида спорта',ok:state.types.length>=3},
+    {emo:'🤹',n:'Универсал',d:'5+ видов спорта',ok:state.types.length>=5},
     {emo:'🚀',n:'Ударная неделя',d:'10+ за неделю',ok:maxWeek>=10},
-    {emo:'👑',n:'Месяц силы',d:'30 за месяц',ok:Math.max(0,...Object.values(monthMap))>=30},
-    {emo:'🧊',n:'Железная воля',d:'Стрик 14 дней',ok:best>=14},
+    {emo:'👑',n:'Месяц силы',d:'30 за месяц',ok:maxMonth>=30},
+    {emo:'✅',n:'Идеальная неделя',d:'Выполнил цель недели',ok:perfectWeeks>=1},
+    {emo:'🎯',n:'Месяц по плану',d:'4 идеальные недели',ok:perfectWeeks>=4},
+    {emo:'📈',n:'Постоянство',d:'Тренировки в 8 недель',ok:activeWeeks>=8},
+    {emo:'📝',n:'Планировщик',d:'Заметка к тренировке',ok:notes>=1},
+    {emo:'🗓',n:'Стратег',d:'Планируешь наперёд',ok:planned},
+    {emo:'♾️',n:'Полугодие',d:'12 идеальных недель',ok:perfectWeeks>=12},
   ];
+  const earned=defs.filter(x=>x.ok).length;
+  document.getElementById('badgeCount').textContent=earned+'/'+defs.length;
   const b=document.getElementById('badges');b.innerHTML='';
-  defs.forEach(x=>{b.innerHTML+=`<div class="badge${x.ok?' earned':''}"><div class="emo">${x.emo}</div><div class="bn">${x.n}</div><div class="bd">${x.d}</div></div>`;});
+  defs.forEach(x=>{b.innerHTML+='<div class="badge'+(x.ok?' earned':'')+'"><div class="emo">'+x.emo+'</div><div class="bn">'+x.n+'</div><div class="bd">'+x.d+'</div></div>';});
 }
 
-// ============ MODAL ============
-const EMOJIS=['🧘','🏐','🎾','🏃','🏋️','🚴','🏊','⚽️','🏀','🥊','🤸','🧗','⛹️','🏓','🏸','🤾','🚶','🤼','🛹','⛸'];
-const COLORS=['#c8ff3d','#36c9ff','#ff5a36','#9d6cff','#ffce47','#3ddc84','#ff7ab8','#ff9a3d'];
-let editId=null, pickEmo=EMOJIS[0], pickCol=COLORS[0], pickGoal=3;
+// ============ SETTINGS ============
+function openSettings(){
+  document.getElementById('goalVal').textContent=state.settings.weeklyGoal;
+  document.querySelectorAll('#themeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.theme===state.settings.theme));
+  document.querySelectorAll('#weekSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ws===state.settings.weekStart));
+  buildTypeList();openModal('settingsModal');
+}
+function buildTypeList(){
+  const box=document.getElementById('typeList');box.innerHTML='';
+  state.types.forEach(t=>{
+    const r=document.createElement('div');r.className='typerow';
+    r.innerHTML='<span class="tr-ic">'+t.emoji+'</span><span class="tr-n">'+esc(t.name)+'</span><span class="tr-e">изменить ›</span>';
+    r.onclick=()=>openType(t);
+    box.appendChild(r);
+  });
+}
+function applyTheme(){document.documentElement.dataset.theme=state.settings.theme;
+  const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',state.settings.theme==='light'?'#f4f4f8':'#0a0a0f');}
 
-function buildPickers(){
-  const ep=document.getElementById('emojiPick');ep.innerHTML='';
-  EMOJIS.forEach(e=>{const d=document.createElement('button');d.className='emo-pick'+(e===pickEmo?' sel':'');d.textContent=e;d.onclick=()=>{pickEmo=e;buildPickers();};ep.appendChild(d);});
-  const cp=document.getElementById('colorPick');cp.innerHTML='';
-  COLORS.forEach(c=>{const d=document.createElement('button');d.className='col-pick'+(c===pickCol?' sel':'');d.style.background=c;d.onclick=()=>{pickCol=c;buildPickers();};cp.appendChild(d);});
-  document.getElementById('goalVal').textContent=pickGoal;
+// ============ TYPE EDITOR ============
+let tedit={id:null,emoji:EMOJIS[0],color:COLORS[0]};
+function openType(t){
+  tedit=t?{id:t.id,emoji:t.emoji,color:t.color}:{id:null,emoji:EMOJIS[0],color:COLORS[0]};
+  document.getElementById('typeModalTitle').textContent=t?'Вид спорта':'Новый вид';
+  document.getElementById('tName').value=t?t.name:'';
+  document.getElementById('tDelete').style.display=t?'block':'none';
+  buildTypePickers();openModal('typeModal');
 }
-function openAdd(){editId=null;pickEmo=EMOJIS[0];pickCol=COLORS[0];pickGoal=3;
-  document.getElementById('modalTitle').textContent='Новая тренировка';
-  document.getElementById('inpName').value='';
-  document.getElementById('deleteBtn').style.display='none';
-  buildPickers();openModal();}
-function openEdit(aid){const a=state.activities.find(x=>x.id===aid);if(!a)return;
-  editId=aid;pickEmo=a.emoji;pickCol=a.color;pickGoal=a.goal;
-  document.getElementById('modalTitle').textContent='Тренировка';
-  document.getElementById('inpName').value=a.name;
-  document.getElementById('deleteBtn').style.display='block';
-  buildPickers();openModal();}
-function openModal(){document.getElementById('modal').classList.add('open');}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-function saveAct(){
-  const name=document.getElementById('inpName').value.trim()||'Тренировка';
-  if(editId){const a=state.activities.find(x=>x.id===editId);a.name=name;a.emoji=pickEmo;a.color=pickCol;a.goal=pickGoal;}
-  else{state.activities.push({id:id(),name,emoji:pickEmo,color:pickCol,goal:pickGoal});}
-  save();closeModal();render();toast(editId?'Сохранено':'Тренировка добавлена');
+function buildTypePickers(){
+  const ep=document.getElementById('tEmoji');ep.innerHTML='';
+  EMOJIS.forEach(e=>{const b=document.createElement('button');b.className='emo-pick'+(e===tedit.emoji?' sel':'');b.textContent=e;b.onclick=()=>{tedit.emoji=e;buildTypePickers();};ep.appendChild(b);});
+  const cp=document.getElementById('tColor');cp.innerHTML='';
+  COLORS.forEach(c=>{const b=document.createElement('button');b.className='col-pick'+(c===tedit.color?' sel':'');b.style.background=c;b.onclick=()=>{tedit.color=c;buildTypePickers();};cp.appendChild(b);});
 }
-function deleteAct(){if(!editId)return;
-  state.activities=state.activities.filter(x=>x.id!==editId);
-  Object.keys(state.log).forEach(k=>{if(state.log[k][editId])delete state.log[k][editId];});
-  save();closeModal();render();toast('Удалено');
+function saveType(){
+  const nm=document.getElementById('tName').value.trim()||'Тренировка';
+  if(tedit.id){const t=typeById(tedit.id);t.name=nm;t.emoji=tedit.emoji;t.color=tedit.color;}
+  else state.types.push({id:id(),name:nm,emoji:tedit.emoji,color:tedit.color});
+  save();closeModal('typeModal');buildTypeList();render();toast('Сохранено');
+}
+function deleteType(){
+  if(!tedit.id)return;
+  if(!confirm('Удалить вид спорта и все его тренировки?'))return;
+  state.types=state.types.filter(t=>t.id!==tedit.id);
+  Object.keys(state.sessions).forEach(dk=>{state.sessions[dk]=state.sessions[dk].filter(s=>s.typeId!==tedit.id);if(!state.sessions[dk].length)delete state.sessions[dk];});
+  state.repeats=state.repeats.filter(r=>r.typeId!==tedit.id);
+  save();closeModal('typeModal');buildTypeList();render();toast('Удалено');
 }
 
 // ============ EFFECTS ============
@@ -602,76 +838,82 @@ function haptic(){if(navigator.vibrate)navigator.vibrate(12);}
 function burst(color){
   for(let i=0;i<14;i++){
     const c=document.createElement('div');c.className='confetti';
-    c.style.background=i%3?color:'#fff';
-    c.style.left=(45+Math.random()*10)+'%';c.style.top='55%';
-    c.style.borderRadius=Math.random()>.5?'50%':'2px';
-    document.body.appendChild(c);
+    c.style.background=i%3?color:'#fff';c.style.left=(45+Math.random()*10)+'%';c.style.top='55%';
+    c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);
     const ang=Math.random()*Math.PI*2,vel=60+Math.random()*120;
     const dx=Math.cos(ang)*vel,dy=Math.sin(ang)*vel-80;
-    c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${dx}px,${dy+200}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:900+Math.random()*400,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>c.remove();
+    c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:'translate('+dx+'px,'+(dy+200)+'px) rotate('+(Math.random()*720)+'deg)',opacity:0}],{duration:900+Math.random()*400,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>c.remove();
   }
 }
-function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-// ============ BACKUP: EXPORT / IMPORT ============
+// ============ MODAL HELPERS ============
+function openModal(idn){document.getElementById(idn).classList.add('open');}
+function closeModal(idn){document.getElementById(idn).classList.remove('open');}
+function rerenderActive(){
+  const p=document.querySelector('.nav-btn.active');const pg=p?p.dataset.page:'today';
+  if(pg==='today')render();else if(pg==='progress')renderProgress();else if(pg==='records')renderRecords();
+}
+
+// ============ BACKUP ============
 function exportData(){
-  const payload={app:'tempo',version:1,exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'tempo',version:2,exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const d=new Date();
-  const fname='tempo-backup-'+dkey(d)+'.json';
-  const a=document.createElement('a');
-  a.href=url;a.download=fname;document.body.appendChild(a);a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},500);
-  toast('Копия сохранена 💾');
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='tempo-backup-'+todayKey()+'.json';document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},500);toast('Копия сохранена 💾');
 }
 function importData(file){
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try{
-      const parsed=JSON.parse(reader.result);
-      const incoming=parsed&&parsed.data?parsed.data:parsed;
-      if(!incoming||!Array.isArray(incoming.activities)||typeof incoming.log!=='object'){
-        toast('Файл не подходит ❌');return;
-      }
-      if(!confirm('Восстановить данные из файла? Текущие данные на телефоне будут заменены.'))return;
-      state={activities:incoming.activities,log:incoming.log||{}};
-      save();render();
-      const p=document.querySelector('.nav-btn.active');if(p&&p.dataset.page==='progress')renderProgress();
-      toast('Данные восстановлены ✅');
-    }catch(e){toast('Не удалось прочитать файл ❌');}
-  };
-  reader.readAsText(file);
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const parsed=JSON.parse(r.result);const inc=parsed&&parsed.data?parsed.data:parsed;
+    const mig=migrate(inc);
+    if(!mig||!Array.isArray(mig.types)){toast('Файл не подходит ❌');return;}
+    if(!confirm('Восстановить данные из файла? Текущие данные заменятся.'))return;
+    state=mig;save();applyTheme();render();toast('Данные восстановлены ✅');
+  }catch(e){toast('Не удалось прочитать файл ❌');}};
+  r.readAsText(file);
 }
 
-// ============ NAV ============
+// ============ WIRING ============
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  const p=b.dataset.page;
+  b.classList.add('active');const p=b.dataset.page;
   document.getElementById('page-'+p).classList.add('active');
-  if(p==='progress')renderProgress();
-  if(p==='records')renderRecords();
+  if(p==='today')render();if(p==='progress')renderProgress();if(p==='records')renderRecords();
   window.scrollTo(0,0);
 }));
+document.getElementById('prevDay').addEventListener('click',()=>{viewDate.setDate(viewDate.getDate()-1);viewDate=new Date(viewDate);render();});
+document.getElementById('nextDay').addEventListener('click',()=>{viewDate.setDate(viewDate.getDate()+1);viewDate=new Date(viewDate);render();});
+document.getElementById('dayCenter').addEventListener('click',()=>{viewDate=new Date();viewDate.setHours(0,0,0,0);render();});
+document.getElementById('addBtn').addEventListener('click',()=>openSession(dkey(viewDate),null));
+document.getElementById('cancelBtn').addEventListener('click',()=>closeModal('modal'));
+document.getElementById('saveBtn').addEventListener('click',saveSession);
+document.getElementById('deleteBtn').addEventListener('click',deleteSession);
+document.getElementById('repeatToggle').addEventListener('click',function(){sess.repeat=!sess.repeat;this.classList.toggle('on',sess.repeat);});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal('modal');});
 
-document.getElementById('addBtn').addEventListener('click',openAdd);
-document.getElementById('cancelBtn').addEventListener('click',closeModal);
-document.getElementById('saveBtn').addEventListener('click',saveAct);
-document.getElementById('deleteBtn').addEventListener('click',deleteAct);
-document.getElementById('goalMinus').addEventListener('click',()=>{pickGoal=Math.max(1,pickGoal-1);document.getElementById('goalVal').textContent=pickGoal;});
-document.getElementById('goalPlus').addEventListener('click',()=>{pickGoal=Math.min(14,pickGoal+1);document.getElementById('goalVal').textContent=pickGoal;});
-document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+document.getElementById('settingsBtn').addEventListener('click',openSettings);
+document.getElementById('settingsClose').addEventListener('click',()=>closeModal('settingsModal'));
+document.getElementById('settingsModal').addEventListener('click',e=>{if(e.target.id==='settingsModal')closeModal('settingsModal');});
+document.getElementById('goalMinus').addEventListener('click',()=>{state.settings.weeklyGoal=Math.max(1,state.settings.weeklyGoal-1);document.getElementById('goalVal').textContent=state.settings.weeklyGoal;save();render();});
+document.getElementById('goalPlus').addEventListener('click',()=>{state.settings.weeklyGoal=Math.min(21,state.settings.weeklyGoal+1);document.getElementById('goalVal').textContent=state.settings.weeklyGoal;save();render();});
+document.querySelectorAll('#themeSeg button').forEach(b=>b.addEventListener('click',()=>{state.settings.theme=b.dataset.theme;applyTheme();openSettings();save();}));
+document.querySelectorAll('#weekSeg button').forEach(b=>b.addEventListener('click',()=>{state.settings.weekStart=b.dataset.ws;save();openSettings();render();}));
+document.getElementById('addTypeBtn').addEventListener('click',()=>openType(null));
 
-// backup buttons
+document.getElementById('tCancel').addEventListener('click',()=>closeModal('typeModal'));
+document.getElementById('tSave').addEventListener('click',saveType);
+document.getElementById('tDelete').addEventListener('click',deleteType);
+document.getElementById('typeModal').addEventListener('click',e=>{if(e.target.id==='typeModal')closeModal('typeModal');});
+
 document.getElementById('exportBtn').addEventListener('click',exportData);
 document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
 document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importData(f);e.target.value='';});
 
-// register SW
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
-
+applyTheme();
 render();
 </script>
 
@@ -691,72 +933,53 @@ window.__FIREBASE_CONFIG__ = {
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-/* __FIREBASE_CONFIG__ */
 const firebaseConfig = window.__FIREBASE_CONFIG__ || null;
-
 const dot = document.getElementById('syncDot');
 const codeInp = document.getElementById('syncCodeInp');
-function setStatus(text,color){ if(dot){ dot.textContent='● '+text; dot.style.color=color||'var(--muted)'; } }
+function setStatus(t,c){ if(dot){ dot.textContent='● '+t; dot.style.color=c||'var(--muted)'; } }
 
 if(!firebaseConfig || !firebaseConfig.apiKey){
   setStatus('облако не настроено','var(--muted)');
 } else {
-  // ---- sync code (no login): a long secret the app remembers ----
-  function genCode(){
-    const a='abcdefghijkmnpqrstuvwxyz23456789';
-    let s='';for(let i=0;i<20;i++)s+=a[Math.floor(Math.random()*a.length)];
-    return s.replace(/(.{5})(?=.)/g,'$1-'); // xxxxx-xxxxx-xxxxx-xxxxx
-  }
-  function normCode(c){ return (c||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
-  function getCode(){ let c=localStorage.getItem('tempo_sync_code'); if(!c){ c=genCode(); localStorage.setItem('tempo_sync_code',c);} return c; }
+  function genCode(){const a='abcdefghijkmnpqrstuvwxyz23456789';let s='';for(let i=0;i<20;i++)s+=a[Math.floor(Math.random()*a.length)];return s.replace(/(.{5})(?=.)/g,'$1-');}
+  function normCode(c){return (c||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+  function getCode(){let c=localStorage.getItem('tempo_sync_code');if(!c){c=genCode();localStorage.setItem('tempo_sync_code',c);}return c;}
   let code=getCode();
 
   const app=initializeApp(firebaseConfig);
   const db=getFirestore(app);
-  let ref=null, unsub=null, applyingRemote=false;
+  let ref=null, unsub=null, lastSeenAt=0;
 
   function push(s){
-    if(applyingRemote||!ref) return;
-    setDoc(ref,{state:s,updatedAt:Date.now()})
-      .then(()=>setStatus('сохранено в облаке','var(--ok)'))
-      .catch(e=>{console.warn('push',e);setStatus('нет сети','var(--flame)');});
+    if(!ref) return;
+    const at=Date.now(); if(at>lastSeenAt)lastSeenAt=at;
+    setDoc(ref,{state:s,updatedAt:at}).then(()=>setStatus('сохранено в облаке','var(--ok)')).catch(e=>{console.warn(e);setStatus('нет сети','var(--flame)');});
   }
   function start(){
     if(unsub){unsub();unsub=null;}
     ref=doc(db,'tempos',normCode(code));
+    lastSeenAt=0;
     setStatus('подключение…','var(--muted)');
     unsub=onSnapshot(ref,snap=>{
-      if(!snap.exists()){ push(window.__getState()); setStatus('синхронизировано','var(--ok)'); return; }
-      const d=snap.data();
-      if(d&&d.state){
-        const remoteJSON=JSON.stringify(d.state);
-        if(remoteJSON!==JSON.stringify(window.__getState())){
-          applyingRemote=true; window.__applyRemote(d.state); applyingRemote=false;
-        }
-      }
+      if(!snap.exists()){push(window.__getState());setStatus('синхронизировано','var(--ok)');return;}
+      if(snap.metadata.hasPendingWrites){return;} // эхо нашей же ещё не закоммиченной записи
+      const d=snap.data();if(!d||!d.state){setStatus('синхронизировано','var(--ok)');return;}
+      const at=d.updatedAt||0;
+      if(at<=lastSeenAt){setStatus('синхронизировано','var(--ok)');return;} // устаревший снимок / наша запись
+      lastSeenAt=at;
+      if(JSON.stringify(d.state)===JSON.stringify(window.__getState())){setStatus('синхронизировано','var(--ok)');return;}
+      window.__applyRemote(d.state);
       setStatus('синхронизировано','var(--ok)');
-    },err=>{console.warn('sync',err);setStatus('нет сети','var(--flame)');});
+    },err=>{console.warn(err);setStatus('нет сети','var(--flame)');});
   }
-
-  // expose for app save()
   window.__cloudPush=(s)=>push(s);
 
-  // ---- UI ----
-  function showCode(){ if(codeInp) codeInp.value=code; }
+  function showCode(){if(codeInp)codeInp.value=code;}
   showCode();
   const copyBtn=document.getElementById('copyCodeBtn');
-  if(copyBtn) copyBtn.addEventListener('click',async()=>{
-    try{ await navigator.clipboard.writeText(code); window.toast&&toast('Код скопирован 📋'); }
-    catch(e){ codeInp.select(); document.execCommand&&document.execCommand('copy'); window.toast&&toast('Код выделен'); }
-  });
+  if(copyBtn)copyBtn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(code);window.toast&&toast('Код скопирован 📋');}catch(e){codeInp.select();document.execCommand&&document.execCommand('copy');window.toast&&toast('Код выделен');}});
   const enterBtn=document.getElementById('enterCodeBtn');
-  if(enterBtn) enterBtn.addEventListener('click',()=>{
-    const v=prompt('Вставь код синхронизации с другого устройства.\n\nВнимание: данные на этом устройстве заменятся данными из того кода.');
-    if(v&&normCode(v).length>=16){
-      code=v.trim(); localStorage.setItem('tempo_sync_code',code); showCode(); start();
-      window.toast&&toast('Код подключён 🔗');
-    } else if(v){ window.toast&&toast('Код слишком короткий ❌'); }
-  });
+  if(enterBtn)enterBtn.addEventListener('click',()=>{const v=prompt('Вставь код синхронизации с другого устройства.\n\nВнимание: данные на этом устройстве заменятся данными из того кода.');if(v&&normCode(v).length>=16){code=v.trim();localStorage.setItem('tempo_sync_code',code);showCode();start();window.toast&&toast('Код подключён 🔗');}else if(v){window.toast&&toast('Код слишком короткий ❌');}});
 
   start();
 }
