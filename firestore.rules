@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Данные приложения «Темп». Доступ — по знанию секретного кода (id документа).
+    match /tempos/{code} {
+      // читать можно, если знаешь код целиком (перечислять всё нельзя)
+      allow get: if true;
+      allow list: if false;
+      // писать можно только валидную структуру и только под длинный код
+      allow create, update: if code.size() >= 16
+        && request.resource.data.keys().hasOnly(['state','updatedAt'])
+        && request.resource.data.state is map
+        && request.resource.data.updatedAt is int;
+      allow delete: if false;
+    }
+  }
+}

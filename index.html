@@ -248,8 +248,19 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);}
   </div>
 
   <div class="histbar">
-    <h3>Резервная копия данных</h3>
-    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Данные хранятся только на этом телефоне. Сохраняй копию перед чисткой Safari или сменой телефона.</p>
+    <h3>Синхронизация &nbsp;<span id="syncDot" style="font-size:13px;color:var(--muted);font-weight:600;">● подключение…</span></h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px;">Данные хранятся в облаке по секретному коду. На новом телефоне введи этот код — и весь прогресс вернётся сам.</p>
+    <label style="font-size:13px;color:var(--muted);font-weight:700;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Твой код синхронизации</label>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="syncCodeInp" readonly value="…" style="flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:15px;font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em;">
+      <button class="btn btn-ghost" id="copyCodeBtn" style="flex:0 0 auto;padding:14px 16px;">Копировать</button>
+    </div>
+    <button class="btn btn-ghost" id="enterCodeBtn" style="width:100%;margin-top:11px;">Ввести код с другого устройства</button>
+  </div>
+
+  <div class="histbar">
+    <h3>Резервная копия в файл</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Дополнительная страховка: выгрузи все данные в файл и храни его где угодно.</p>
     <div style="display:flex;gap:11px;flex-wrap:wrap;">
       <button class="btn btn-primary" id="exportBtn" style="flex:1;min-width:140px;">⬇ Сохранить копию</button>
       <button class="btn btn-ghost" id="importBtn" style="flex:1;min-width:140px;">⬆ Восстановить</button>
@@ -336,7 +347,9 @@ function defaults(){return{activities:[
   {id:id(),name:'Волейбол',emoji:'🏐',color:'#ff5a36',goal:2},
   {id:id(),name:'Падел',emoji:'🎾',color:'#c8ff3d',goal:2}
 ],log:{}};}// log: {date:{actId:true}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));if(window.__cloudPush)window.__cloudPush(state);}
+window.__getState=()=>state;
+window.__applyRemote=function(s){state=s;localStorage.setItem(KEY,JSON.stringify(state));render();const p=document.querySelector('.nav-btn.active');if(p){if(p.dataset.page==='progress')renderProgress();if(p.dataset.page==='records')renderRecords();}};
 function id(){return Math.random().toString(36).slice(2,9);}
 let state=load();
 
@@ -660,6 +673,93 @@ document.getElementById('importFile').addEventListener('change',e=>{const f=e.ta
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 
 render();
+</script>
+
+<script>
+window.__FIREBASE_CONFIG__ = {
+  apiKey: "AIzaSyC2foKn9FPWYOqR3y44GCVkMGVSLM0xLPE",
+  authDomain: "tempo-63535.firebaseapp.com",
+  projectId: "tempo-63535",
+  storageBucket: "tempo-63535.firebasestorage.app",
+  messagingSenderId: "511067564235",
+  appId: "1:511067564235:web:6e49dd28d9c40fde38134e"
+};
+</script>
+
+<!-- ============ CLOUD SYNC (Firebase) ============ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+/* __FIREBASE_CONFIG__ */
+const firebaseConfig = window.__FIREBASE_CONFIG__ || null;
+
+const dot = document.getElementById('syncDot');
+const codeInp = document.getElementById('syncCodeInp');
+function setStatus(text,color){ if(dot){ dot.textContent='● '+text; dot.style.color=color||'var(--muted)'; } }
+
+if(!firebaseConfig || !firebaseConfig.apiKey){
+  setStatus('облако не настроено','var(--muted)');
+} else {
+  // ---- sync code (no login): a long secret the app remembers ----
+  function genCode(){
+    const a='abcdefghijkmnpqrstuvwxyz23456789';
+    let s='';for(let i=0;i<20;i++)s+=a[Math.floor(Math.random()*a.length)];
+    return s.replace(/(.{5})(?=.)/g,'$1-'); // xxxxx-xxxxx-xxxxx-xxxxx
+  }
+  function normCode(c){ return (c||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+  function getCode(){ let c=localStorage.getItem('tempo_sync_code'); if(!c){ c=genCode(); localStorage.setItem('tempo_sync_code',c);} return c; }
+  let code=getCode();
+
+  const app=initializeApp(firebaseConfig);
+  const db=getFirestore(app);
+  let ref=null, unsub=null, applyingRemote=false;
+
+  function push(s){
+    if(applyingRemote||!ref) return;
+    setDoc(ref,{state:s,updatedAt:Date.now()})
+      .then(()=>setStatus('сохранено в облаке','var(--ok)'))
+      .catch(e=>{console.warn('push',e);setStatus('нет сети','var(--flame)');});
+  }
+  function start(){
+    if(unsub){unsub();unsub=null;}
+    ref=doc(db,'tempos',normCode(code));
+    setStatus('подключение…','var(--muted)');
+    unsub=onSnapshot(ref,snap=>{
+      if(!snap.exists()){ push(window.__getState()); setStatus('синхронизировано','var(--ok)'); return; }
+      const d=snap.data();
+      if(d&&d.state){
+        const remoteJSON=JSON.stringify(d.state);
+        if(remoteJSON!==JSON.stringify(window.__getState())){
+          applyingRemote=true; window.__applyRemote(d.state); applyingRemote=false;
+        }
+      }
+      setStatus('синхронизировано','var(--ok)');
+    },err=>{console.warn('sync',err);setStatus('нет сети','var(--flame)');});
+  }
+
+  // expose for app save()
+  window.__cloudPush=(s)=>push(s);
+
+  // ---- UI ----
+  function showCode(){ if(codeInp) codeInp.value=code; }
+  showCode();
+  const copyBtn=document.getElementById('copyCodeBtn');
+  if(copyBtn) copyBtn.addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(code); window.toast&&toast('Код скопирован 📋'); }
+    catch(e){ codeInp.select(); document.execCommand&&document.execCommand('copy'); window.toast&&toast('Код выделен'); }
+  });
+  const enterBtn=document.getElementById('enterCodeBtn');
+  if(enterBtn) enterBtn.addEventListener('click',()=>{
+    const v=prompt('Вставь код синхронизации с другого устройства.\n\nВнимание: данные на этом устройстве заменятся данными из того кода.');
+    if(v&&normCode(v).length>=16){
+      code=v.trim(); localStorage.setItem('tempo_sync_code',code); showCode(); start();
+      window.toast&&toast('Код подключён 🔗');
+    } else if(v){ window.toast&&toast('Код слишком короткий ❌'); }
+  });
+
+  start();
+}
 </script>
 </body>
 </html>
