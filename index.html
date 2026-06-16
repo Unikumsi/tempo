@@ -17,11 +17,13 @@
   --text:#f2f2f7;--muted:#8b8b9e;
   --lime:#c8ff3d;--lime-dim:#9bc62e;--flame:#ff5a36;--ice:#36c9ff;--violet:#9d6cff;--gold:#ffce47;--ok:#3ddc84;
   --on-accent:#0a0a0f;
+  --accent-ink:#c8ff3d;--bar:#9bc62e;--bar-cur:#c8ff3d;
 }
 html[data-theme="light"]{
   --bg:#f4f4f8;--surface:#ffffff;--surface-2:#ececf3;--line:#e0e0ea;
   --text:#16161e;--muted:#76768a;
   --lime-dim:#7aab2a;--on-accent:#0a0a0f;
+  --accent-ink:#46850f;--bar:#9bc34a;--bar-cur:#4f9e0e;--gold:#9a6f00;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;}
@@ -42,7 +44,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .daynav .arrow{width:46px;height:46px;flex:0 0 auto;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .daynav .arrow:active{transform:scale(.92);}
 .daynav .dcenter{flex:1;text-align:center;cursor:pointer;}
-.daynav .drel{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);font-weight:800;}
+.daynav .drel{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink);font-weight:800;}
 .daynav .ddate{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:2px;}
 
 /* Hero ring */
@@ -55,7 +57,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .ring-pct{font-size:30px;font-weight:850;letter-spacing:-.03em;line-height:1;}
 .ring-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-top:4px;font-weight:700;}
 .hero-info{flex:1;}
-.hero-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);font-weight:800;}
+.hero-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink);font-weight:800;}
 .hero-count{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:4px;}
 .hero-count small{font-size:17px;color:var(--muted);font-weight:700;}
 .hero-msg{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.4;}
@@ -64,7 +66,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .wd-name{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;}
 .wd-dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--muted);transition:.3s;}
 .wd.done .wd-dot{background:var(--lime);border-color:var(--lime);color:var(--on-accent);}
-.wd.partial .wd-dot{border-color:var(--lime);color:var(--lime);}
+.wd.partial .wd-dot{border-color:var(--accent-ink);color:var(--accent-ink);}
 .wd.sel .wd-dot{box-shadow:0 0 0 3px rgba(200,255,61,.25);}
 .wd.today .wd-name{color:var(--text);}
 
@@ -105,7 +107,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .nav-in{display:flex;width:100%;max-width:520px;}
 .nav-btn{flex:1;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px;}
 .nav-btn svg{width:24px;height:24px;}
-.nav-btn.active{color:var(--lime);}
+.nav-btn.active{color:var(--accent-ink);}
 
 .page{display:none;padding-bottom:120px;}
 .page.active{display:block;}
@@ -117,12 +119,13 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .statcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;}
 .statcard .v{font-size:30px;font-weight:850;letter-spacing:-.03em;}
 .statcard .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-top:4px;}
-.statcard.accent .v{color:var(--lime);}
+.statcard.accent .v{color:var(--accent-ink);}
 .statcard.flame .v{color:var(--flame);}
 .statcard.gold .v{color:var(--gold);}
 
 .histbar{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px;}
 .histbar h3{font-size:15px;font-weight:750;margin-bottom:16px;}
+.hint{font-size:12px;color:var(--muted);line-height:1.4;margin:-8px 0 16px;}
 .bars{display:flex;align-items:flex-end;gap:8px;height:130px;}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end;}
 .bar{width:100%;background:var(--surface-2);border-radius:6px 6px 3px 3px;min-height:4px;transition:height .5s;position:relative;}
@@ -262,23 +265,12 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
     <div class="statcard"><div class="v" id="stWeek">0%</div><div class="l">Эта неделя</div></div>
     <div class="statcard gold"><div class="v" id="stMonth">0</div><div class="l">В этом месяце</div></div>
   </div>
-  <div class="histbar"><h3>Тренировки за 8 недель</h3><div class="bars" id="weekBars"></div></div>
+  <div class="histbar"><h3>Тренировки по неделям</h3><p class="hint">Каждый столбик — одна неделя (последний справа — текущая). Число под ним — дата начала недели, день/месяц.</p><div class="bars" id="weekBars"></div></div>
   <div class="histbar">
     <h3>Последние недели</h3>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;font-size:10px;color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;" id="heatHead"></div>
     <div class="heat" id="heatmap"></div>
     <div class="legend">меньше <i style="background:var(--surface-2)"></i><i style="background:#3a5a1a"></i><i style="background:#7aab2a"></i><i style="background:var(--lime)"></i> больше</div>
-  </div>
-
-  <div class="histbar">
-    <h3>Синхронизация &nbsp;<span id="syncDot" style="font-size:13px;color:var(--muted);font-weight:600;">● подключение…</span></h3>
-    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px;">Данные хранятся в облаке по секретному коду. На новом телефоне введи этот код — и весь прогресс вернётся сам.</p>
-    <label style="font-size:13px;color:var(--muted);font-weight:700;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Твой код синхронизации</label>
-    <div style="display:flex;gap:8px;">
-      <input type="text" id="syncCodeInp" readonly value="…" style="flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:15px;font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em;">
-      <button class="btn btn-ghost" id="copyCodeBtn" style="flex:0 0 auto;padding:14px 16px;">Копировать</button>
-    </div>
-    <button class="btn btn-ghost" id="enterCodeBtn" style="width:100%;margin-top:11px;">Ввести код с другого устройства</button>
   </div>
 </div>
 </div>
@@ -357,6 +349,15 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
       <label>Виды спорта</label>
       <div id="typeList"></div>
       <button class="btn btn-ghost" id="addTypeBtn" style="width:100%;margin-top:4px;">＋ Добавить вид спорта</button>
+    </div>
+    <div class="field">
+      <label>Синхронизация &nbsp;<span id="syncDot" style="font-size:12px;color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0;">● подключение…</span></label>
+      <p class="hint" style="margin:-2px 0 12px;">Данные хранятся в облаке по секретному коду. На новом телефоне введи этот код — и весь прогресс вернётся сам.</p>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="syncCodeInp" readonly value="…" style="flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:15px;font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em;">
+        <button class="btn btn-ghost" id="copyCodeBtn" style="flex:0 0 auto;padding:14px 16px;">Копировать</button>
+      </div>
+      <button class="btn btn-ghost" id="enterCodeBtn" style="width:100%;margin-top:11px;">Ввести код с другого устройства</button>
     </div>
     <div class="sheet-btns"><button class="btn btn-primary" id="settingsClose">Готово</button></div>
   </div>
@@ -696,7 +697,7 @@ function renderProgress(){
   weeks.forEach((wm,i)=>{
     const h=counts[i]/max*100;const isCur=i===weeks.length-1;
     const col=document.createElement('div');col.className='bar-col';
-    col.innerHTML='<div class="bar" style="height:'+Math.max(h,3)+'%;background:'+(isCur?'var(--lime)':counts[i]?'var(--lime-dim)':'var(--surface-2)')+'">'+(counts[i]?'<span class="bar-val">'+counts[i]+'</span>':'')+'</div><div class="bar-lbl">'+wm.getDate()+'/'+(wm.getMonth()+1)+'</div>';
+    col.innerHTML='<div class="bar" style="height:'+Math.max(h,3)+'%;background:'+(isCur?'var(--bar-cur)':counts[i]?'var(--bar)':'var(--surface-2)')+'">'+(counts[i]?'<span class="bar-val">'+counts[i]+'</span>':'')+'</div><div class="bar-lbl"'+(isCur?' style="color:var(--accent-ink);font-weight:800"':'')+'>'+wm.getDate()+'/'+(wm.getMonth()+1)+'</div>';
     bars.appendChild(col);
   });
 
