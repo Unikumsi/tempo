@@ -27,6 +27,8 @@ html[data-theme="light"]{
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;}
+html{color-scheme:dark;}
+html[data-theme="light"]{color-scheme:light;}
 body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);transition:background .3s;}
 .wrap{max-width:520px;margin:0 auto;padding:0 18px;}
 
@@ -85,6 +87,7 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
 .act-name .rep{font-size:11px;color:var(--violet);font-weight:800;}
 .act-note{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35;white-space:pre-wrap;word-break:break-word;}
 .act-meta{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600;}
+.act-time{font-size:12px;font-weight:800;color:var(--accent-ink);background:var(--surface-2);border-radius:8px;padding:2px 8px;}
 .act-btn{flex:0 0 auto;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--surface-2);color:var(--text);font-size:21px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
 .act-btn:active{transform:scale(.88);}
 .act.complete .act-btn{background:var(--ok);border-color:var(--ok);color:var(--on-accent);}
@@ -310,6 +313,14 @@ body{overscroll-behavior-y:contain;padding-bottom:env(safe-area-inset-bottom);tr
       <div class="field"><label>Цвет</label><div class="colors" id="colorPick"></div></div>
     </div>
     <div class="field">
+      <label>Дата и время</label>
+      <div style="display:flex;gap:10px;">
+        <input type="date" id="inpDate" style="flex:1;min-width:0;">
+        <input type="time" id="inpTime" style="flex:0 0 132px;">
+      </div>
+      <div class="hint" style="margin:8px 0 0;">Время можно не указывать.</div>
+    </div>
+    <div class="field">
       <label>Заметка / план тренировки</label>
       <textarea id="inpNote" placeholder="Упражнения, вес, повторы, цель…"></textarea>
     </div>
@@ -462,10 +473,16 @@ function sessionsFor(dk){
   state.repeats.forEach(r=>{
     if(r.weekday===wd && dk>=(r.from||'0') && !(r.skips||[]).includes(dk)){
       if(!explicit.some(s=>s.repeatId===r.id))
-        virt.push({id:'v_'+r.id+'_'+dk,virtual:true,repeatId:r.id,typeId:r.typeId,note:r.note||'',done:false});
+        virt.push({id:'v_'+r.id+'_'+dk,virtual:true,repeatId:r.id,typeId:r.typeId,note:r.note||'',time:r.time||'',done:false});
     }
   });
-  return explicit.concat(virt);
+  const all=explicit.concat(virt);
+  all.sort((a,b)=>{
+    const ta=a.time||'',tb=b.time||'';
+    if(ta&&tb) return ta<tb?-1:(ta>tb?1:0);
+    if(ta) return -1; if(tb) return 1; return 0;
+  });
+  return all;
 }
 function doneCount(dk){return sessionsFor(dk).filter(s=>s.done).length;}
 function plannedCount(dk){return sessionsFor(dk).length;}
@@ -532,7 +549,7 @@ function render(){
     el.className='act'+(s.done?' complete':'')+(s.virtual?' virtual':'');
     el.innerHTML='<div class="act-bar" style="background:'+t.color+'"></div>'+
       '<div class="act-icon">'+t.emoji+'</div>'+
-      '<div class="act-body"><div class="act-name">'+esc(t.name)+(s.repeatId?'<span class="rep">↻</span>':'')+'</div>'+
+      '<div class="act-body"><div class="act-name">'+esc(t.name)+(s.repeatId?'<span class="rep">↻</span>':'')+(s.time?'<span class="act-time">'+s.time+'</span>':'')+'</div>'+
       (s.note?'<div class="act-note">'+esc(s.note)+'</div>':'')+'</div>'+
       '<button class="act-btn">'+(s.done?'✓':'')+'</button>';
     el.querySelector('.act-icon').addEventListener('click',()=>openSession(dk,s));
@@ -551,7 +568,7 @@ function render(){
   pl.forEach(s=>{
     const t=typeById(s.typeId)||{name:'Тренировка',emoji:'🏃'};
     const el=document.createElement('div');el.className='peek-item';
-    el.innerHTML='<span class="pi-ic">'+t.emoji+'</span><span class="pi-n">'+esc(t.name)+'</span>';
+    el.innerHTML='<span class="pi-ic">'+t.emoji+'</span><span class="pi-n">'+esc(t.name)+'</span>'+(s.time?'<span style="margin-left:auto;color:var(--muted);font-weight:700;font-size:13px;">'+s.time+'</span>':'');
     el.addEventListener('click',()=>{viewDate=new Date(nd);render();});
     peek.appendChild(el);
   });
@@ -606,16 +623,22 @@ function openSession(dk,existing){
         nt:{on:false,name:'',emoji:EMOJIS[0],color:COLORS[0]}};
   document.getElementById('modalTitle').textContent=existing?'Тренировка':'Новая тренировка';
   document.getElementById('inpNote').value=sess.note;
+  document.getElementById('inpDate').value=dk;
+  document.getElementById('inpTime').value=existing?(existing.time||''):'';
   document.getElementById('deleteBtn').style.display=existing?'block':'none';
   // repeat field only for new (non-repeat) sessions
   const showRepeat=!existing;
   document.getElementById('repeatField').style.display=showRepeat?'block':'none';
-  const wlabel=['понедельникам','вторникам','средам','четвергам','пятницам','субботам','воскресеньям'][monIdx(parseDk(dk))];
-  document.getElementById('repeatLabel').textContent='Повторять по '+wlabel;
+  updateRepeatLabel();
   document.getElementById('repeatToggle').classList.remove('on');
   document.getElementById('newTypeBox').style.display='none';
   buildTypeChips(); buildEmojiColor();
   openModal('modal');
+}
+function updateRepeatLabel(){
+  const v=document.getElementById('inpDate').value||sess.dk;
+  const wlabel=['понедельникам','вторникам','средам','четвергам','пятницам','субботам','воскресеньям'][monIdx(parseDk(v))];
+  document.getElementById('repeatLabel').textContent='Повторять по '+wlabel;
 }
 function buildTypeChips(){
   const box=document.getElementById('typeChips');box.innerHTML='';
@@ -638,6 +661,8 @@ function buildEmojiColor(){
 }
 function saveSession(){
   sess.note=document.getElementById('inpNote').value.trim();
+  const newDk=document.getElementById('inpDate').value||sess.dk;
+  const time=document.getElementById('inpTime').value||'';
   let typeId=sess.typeId;
   if(sess.nt.on){
     const nm=document.getElementById('inpTypeName').value.trim();
@@ -650,17 +675,26 @@ function saveSession(){
     if(sess.edit.virtual){
       // editing a repeat occurrence -> edit whole repeat template
       const r=state.repeats.find(x=>x.id===sess.edit.repeatId);
-      if(r){r.typeId=typeId;r.note=sess.note;}
+      if(r){r.typeId=typeId;r.note=sess.note;r.time=time;}
     } else {
       const arr=state.sessions[sess.dk]||[];const it=arr.find(x=>x.id===sess.edit.id);
-      if(it){it.typeId=typeId;it.note=sess.note;}
+      if(it){
+        it.typeId=typeId;it.note=sess.note;it.time=time;
+        if(newDk!==sess.dk){
+          state.sessions[sess.dk]=arr.filter(x=>x.id!==it.id);
+          if(!state.sessions[sess.dk].length)delete state.sessions[sess.dk];
+          state.sessions[newDk]=state.sessions[newDk]||[];
+          state.sessions[newDk].push(it);
+        }
+      }
     }
   } else if(sess.repeat){
-    state.repeats.push({id:id(),typeId:typeId,weekday:monIdx(parseDk(sess.dk)),note:sess.note,from:sess.dk,skips:[]});
+    state.repeats.push({id:id(),typeId:typeId,weekday:monIdx(parseDk(newDk)),note:sess.note,time:time,from:newDk,skips:[]});
   } else {
-    state.sessions[sess.dk]=state.sessions[sess.dk]||[];
-    state.sessions[sess.dk].push({id:id(),typeId:typeId,note:sess.note,done:false});
+    state.sessions[newDk]=state.sessions[newDk]||[];
+    state.sessions[newDk].push({id:id(),typeId:typeId,note:sess.note,time:time,done:false});
   }
+  viewDate=parseDk(newDk);
   save();closeModal('modal');render();toast(sess.edit?'Сохранено':'Добавлено');
 }
 function deleteSession(){
@@ -916,6 +950,7 @@ document.getElementById('cancelBtn').addEventListener('click',()=>closeModal('mo
 document.getElementById('saveBtn').addEventListener('click',saveSession);
 document.getElementById('deleteBtn').addEventListener('click',deleteSession);
 document.getElementById('repeatToggle').addEventListener('click',function(){sess.repeat=!sess.repeat;this.classList.toggle('on',sess.repeat);});
+document.getElementById('inpDate').addEventListener('change',updateRepeatLabel);
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal('modal');});
 
 document.getElementById('settingsBtn').addEventListener('click',openSettings);
